@@ -1,0 +1,33 @@
+version: '2'
+services:
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+#    ports:
+#      - "6786:3306"
+    networks:
+      my-bridge:
+        ipv4_address: 10.10.0.15
+
+  web:
+    build: ./web
+    ports:
+      - "5080:80"
+      - "5022:22"
+    networks:
+      my-bridge:
+        ipv4_address: 10.10.0.10
+    depends_on:
+      - db
+
+networks:
+  my-bridge:
+    driver: bridge
+    ipam: 
+      driver: default
+      config:
+        - subnet: 10.10.0.0/24
+          gateway: 10.10.0.1
