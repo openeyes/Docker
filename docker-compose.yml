@@ -18,7 +18,6 @@ services:
     build: ./web
     ports:
       - "5080:80"
-      - "5022:22"
     networks:
       my-bridge:
         ipv4_address: 10.10.0.10
