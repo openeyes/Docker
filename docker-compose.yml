@@ -1,6 +1,7 @@
 version: '2'
 services:
 
+# MariaDB server
   db:
     image: mariadb
     restart: always
@@ -12,6 +13,7 @@ services:
       my-bridge:
         ipv4_address: 10.10.0.15
 
+# Apache and PHP server
   web:
     build: ./web
     ports:
