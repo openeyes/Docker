@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+
+# MariaDB server
+  db:
+    build: db
+#    restart: always
+#    environment:
+#      MYSQL_ROOT_PASSWORD: password
+#    ports:
+#      - "6786:3306"
+    networks:
+      my-bridge:
+        ipv4_address: 10.10.0.15
+
+# Apache and PHP server
+  web:
+    build: web
+    ports:
+      - "88:80"
+    networks:
+      my-bridge:
+        ipv4_address: 10.10.0.10
+    depends_on:
+      - db
+    links:
+      - "db"
+
+networks:
+  my-bridge:
+    driver: bridge
+    ipam: 
+      driver: default
+      config:
+        - subnet: 10.10.0.0/24
+          gateway: 10.10.0.1
