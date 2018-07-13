@@ -4,10 +4,16 @@ services:
 
 # MariaDB server
   db:
-    build: db
+    image: mariadb:10.3
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      TZ: "Europe/London"
+      #MYSQL_DATABASE: openeyes
+      #MYSQL_USER: openeyes
+      #MYSQL_PASSWORD: openeyes
     volumes:
       - ./share/mysql:/var/lib/mysql
-
+      
 # Apache and PHP server
   web:
     build: web
