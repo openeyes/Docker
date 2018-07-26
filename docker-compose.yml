@@ -8,9 +8,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       TZ: "Europe/London"
-      #MYSQL_DATABASE: openeyes
-      #MYSQL_USER: openeyes
-      #MYSQL_PASSWORD: openeyes
     volumes:
       - ./share/mysql:/var/lib/mysql
       
