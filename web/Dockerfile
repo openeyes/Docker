@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Europe/London
+ENV DEBIAN_FRONTEND=noninteractive \ 
+    TZ=Europe/London
 
 RUN apt-get update \
  && apt-get install -y software-properties-common \
