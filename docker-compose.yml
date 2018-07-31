@@ -6,10 +6,10 @@ services:
   db:
     image: mariadb:10.3
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: openeyes
       TZ: "Europe/London"
     volumes:
-      - ./share/mysql:/var/lib/mysql
+      - .share/mysql:/var/lib/mysql
       
 # Apache and PHP server
   web:
@@ -19,6 +19,6 @@ services:
     depends_on:
       - db
     volumes:
-      - ./share/html:/var/www/html/
-      - ./share/etc-openeyes:/etc/openeyes
-      - ./share/phpini:/usr/local/etc/php/
+      - .share/html:/var/www/html/
+      - .share/etc-openeyes:/etc/openeyes
+      - .share/phpini:/usr/local/etc/php/
