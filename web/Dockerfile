@@ -1,7 +1,11 @@
 FROM ubuntu:18.04
 
-ENV DEBIAN_FRONTEND=noninteractive \ 
-    TZ=Europe/London
+ARG OE_MODE=LIVE # Can be LIVE or DEV
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/London
+ENV OE_MODE=${OE_MODE}
+
 
 RUN apt-get update \
  && apt-get install -y software-properties-common \
@@ -16,9 +20,9 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -  \
 # install grunt
  && npm install -g grunt-cli \
  && a2enmod rewrite \
- && rm -rf /var/lib/apt/lists/* \ 
+ && rm -rf /var/lib/apt/lists/* \
  && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
- 
+
 EXPOSE 80
 
 ENTRYPOINT apachectl -DFOREGROUND
