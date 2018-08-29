@@ -1,11 +1,12 @@
 FROM ubuntu:18.04
 
-ARG OE_MODE=LIVE # Can be LIVE or DEV
+ARG BUILD_MODE=LIVE # Can be LIVE or DEV
+ARG BUILD_BRANCH=LIVE
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/London
-ENV OE_MODE=${OE_MODE}
-
+# ENV OE_MODE=${OE_MODE}
+ENV OE_NO_DB='true'
 
 RUN apt-get update \
  && apt-get install -y software-properties-common \
