@@ -1,28 +1,65 @@
-FROM ubuntu:18.04
+FROM ubuntu:bionic as builder
 
-ARG BUILD_MODE=LIVE # Can be LIVE or DEV
-ARG BUILD_BRANCH=LIVE
+#FROM php:5.6 as builder
 
-ENV DEBIAN_FRONTEND=noninteractive
+ARG BUILD_BRANCH=master
+ARG BUILD_GITROOT=openeyes
+ARG SSH_PRIVATE_KEY
+
+ARG DEBIAN_FRONTEND=noninteractive
+
 ENV TZ=Europe/London
-# ENV OE_MODE=${OE_MODE}
-ENV OE_NO_DB='true'
+ENV OE_MODE=BUILD
+ENV OE_NO_DB=TRUE
+	# db never needed for building
 
-RUN apt-get update \
- && apt-get install -y software-properties-common \
- && add-apt-repository ppa:ondrej/php \
- && apt-get update \
- && apt-get install -y sudo git-core curl php5.6 imagemagick libjpeg62 debconf-utils unzip xfonts-75dpi libgamin0 gamin xfonts-base ruby ant libreoffice-core libreoffice-common libreoffice-writer libapache2-mod-php5.6 php5.6-cli php5.6-mysql php5.6-ldap php5.6-curl php5.6-xsl php5.6-gd php-imagick php5.6-mcrypt php5.6-imagick
+WORKDIR /root/
 
-# install node.js, npm and grunt
-RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -  \
- && sudo apt-get install -y nodejs \
- && npm install -g npm \
-# install grunt
- && npm install -g grunt-cli \
- && a2enmod rewrite \
- && rm -rf /var/lib/apt/lists/* \
- && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt-get update && apt-get install -y sudo git-core tzdata \
+    && ln -sf /usr/share/zoneinfo/${TZ:-Europe/London} /etc/localtime
+
+# dialog apt-utils
+RUN mkdir -p /root/.ssh
+#RUN echo "IdentityFile ~/.ssh/id_rsa" > /root/.ssh/config \
+RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa && echo "IdentityFile ~/.ssh/id_rsa" > /root/.ssh/config \
+    && chmod 600 /root/.ssh/id_rsa
+
+ARG CACHEBUSTER=$RANDOM
+	# Use this to prevent build cache using an old version of source files
+
+RUN ssh -oStrictHostKeyChecking=no git@github.com -T \
+	|| git clone --depth=1 -b ${BUILD_BRANCH} git@github.com:${BUILD_GITROOT}/openeyes.git openeyes  
+	RUN sudo bash openeyes/protected/scripts/install-system.sh 
+	RUN sudo bash openeyes/protected/scripts/install-oe.sh --accept
+
+
+# Delete all git and build assets before copy
+RUN find . -name '.git*' -exec rm -rf {} +
+
+############ FINAL IMAGE #############
+
+FROM ubuntu:bionic
+
+#FROM php:5.6-apache
+
+ARG BUILD_MODE=LIVE
+	# Can be LIVE or DEV
+ARG BUILD_NO_DB=TRUE
+	# By default we expect an external database container to be used
+	# Set this arg to false to install mariadb inside the container
+ARG EXTRA_PACKAGES=""
+
+ENV $OE_INSTALL_EXTRA_PACKAGES=$EXTRA_PACKAGES
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/London
+ENV OE_MODE=${BUILD_MODE}
+ENV OE_NO_DB=${BUILD_NO_DB}
+WORKDIR /var/www/html
+COPY --from=builder /root/openeyes/* .
+RUN bash ./protected/scripts/install-system.sh \ 
+	&& bash ./protected/scripts/install-oe.sh --accept --no-checkout \
+	&& apt clean
 
 EXPOSE 80
 
