@@ -1,0 +1,4 @@
+deb http://ppa.launchpad.net/ondrej/php/ubuntu $OS_VERSION main
+# deb-src http://ppa.launchpad.net/ondrej/php/ubuntu $OS_VERSION main
+deb http://ppa.launchpad.net/ondrej/apache2/ubuntu $OS_VERSION main 
+# deb-src http://ppa.launchpad.net/ondrej/apache2/ubuntu $OS_VERSION main 

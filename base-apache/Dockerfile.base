@@ -1,0 +1,36 @@
+## Builds a base image with OS application dependencies ready installed
+## For use with OpenEyes
+
+ARG OS_VERSION=bionic
+
+FROM ubuntu:$OS_VERSION
+
+ARG OS_VERSION
+ARG DEBIAN_FRONTEND=noninteractive
+ARG TIMEZONE="Europe/London"
+
+ENV TZ=$TIMEZONE
+
+WORKDIR /root/
+
+ADD sources sources
+
+# add extra PPAs,  set timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+ && apt-get update && apt-get install -y gnupg apt-utils
+RUN bash sources/set-sources.sh
+
+# Install apps, plus npm
+RUN apt-get install -y sudo git-core curl php5.6 php5.6-mbstring php5.6-cli php5.6-mysql php5.6-ldap php5.6-curl php5.6-xsl php5.6-gd php5.6-mcrypt php5.6-imagick libjpeg62 debconf-utils unzip xfonts-75dpi libgamin0 gamin xfonts-base libreoffice-core libreoffice-common libreoffice-writer libapache2-mod-php5.6 ffmpeg ruby-compass nodejs npm \
+ && npm install -g npm \
+ && npm install -g grunt-cli \
+ && a2enmod rewrite \
+ && apt-get clean -y \
+ && rm -rf /var/lib/apt/lists/*
+
+# Insatll composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+ && php composer-setup.php \
+ && php -r "unlink('composer-setup.php');" \
+ && mv composer.phar /usr/local/bin/composer \ 
+
