@@ -13,25 +13,53 @@ ENV TZ=$TIMEZONE
 
 WORKDIR /root/
 
-
-
-# Set timezone, add standard packes, apt clean at the end to minimise layer size
+# Set timezone, add common packes, apt clean at the end to minimise layer size
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
- && apt-get update && apt-get install -y gnupg sudo git-core curl libjpeg62 debconf-utils unzip xfonts-75dpi libgamin0 gamin xfonts-base libreoffice-core libreoffice-common libreoffice-writer \
- && apt-get clean -y \
+ && apt-get update && apt-get install -y \
+   curl \
+   debconf-utils \
+   gamin \
+   git-core \
+   gnupg \
+   libgamin0 \
+   libjpeg62 \
+   libreoffice-common \
+   libreoffice-core \
+   libreoffice-writer \
+   unzip \
+   xfonts-75dpi \
+   xfonts-base \
+   sudo \
+ && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Add additional PPAs depending on OS
 ADD sources.${OS_VERSION}/ sources
 ADD set-sources.sh set-sources.sh
+
 RUN bash set-sources.sh
 
 # Install furtherapps, plus npm, using additional PPAs
-RUN apt-get update && apt-get install -y php5.6 php5.6-mbstring php5.6-cli php5.6-mysql php5.6-ldap php5.6-curl php5.6-xsl php5.6-gd php5.6-mcrypt php5.6-imagick libapache2-mod-php5.6 ffmpeg ruby-compass nodejs npm \
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libapache2-mod-php5.6 \
+    nodejs \
+    npm \
+    php5.6 \
+    php5.6-cli \
+    php5.6-curl \
+    php5.6-gd \
+    php5.6-imagick \
+    php5.6-ldap \
+    php5.6-mbstring \
+    php5.6-mcrypt \
+    php5.6-mysql \
+    php5.6-xsl \
+    ruby-compass \
  && npm install -g npm \
  && npm install -g grunt-cli \
  && a2enmod rewrite \
- && apt-get clean -y \
+ && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Insatll composer
