@@ -16,6 +16,7 @@ WORKDIR /root/
 # Set timezone, add common packes, apt clean at the end to minimise layer size
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
  && apt-get update && apt-get install -y \
+   apache2 \
    curl \
    debconf-utils \
    gamin \
@@ -31,7 +32,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
    xfonts-base \
    sudo \
  && apt-get autoremove -y \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /var/www/html/*
 
 # Add additional PPAs depending on OS
 ADD sources.${OS_VERSION}/ sources
@@ -62,7 +64,7 @@ RUN apt-get update && apt-get install -y \
  && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/*
 
-# Insatll composer
+# Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
  && php composer-setup.php \
  && php -r "unlink('composer-setup.php');" \
