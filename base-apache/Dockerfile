@@ -57,6 +57,7 @@ RUN apt-get update && apt-get install -y \
     php5.6-mcrypt \
     php5.6-mysql \
     php5.6-xsl \
+    php5.6-zip \
     ruby-compass \
  && npm install -g npm \
  && npm install -g grunt-cli \
