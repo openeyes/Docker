@@ -33,13 +33,16 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
    sudo \
  && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/* \
- && rm -rf /var/www/html/*
+ && rm -rf /var/www/html/* \
+  && sudo wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -O /etc/bash_completion.d/git-completion.bash \
+  && sudo wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -O /etc/bash_completion.d/git-prompt.sh
+
 
 # Add additional PPAs depending on OS
 ADD sources.${OS_VERSION}/ sources
 ADD set-sources.sh set-sources.sh
 
-RUN bash set-sources.sh
+RUN bash set-sources.sh 
 
 # Install furtherapps, plus npm, using additional PPAs
 RUN apt-get update && apt-get install -y \
