@@ -33,10 +33,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
    sudo \
  && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/* \
- && rm -rf /var/www/html/* \
-  && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -O /etc/bash_completion.d/git-completion.bash \
-  && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -O /etc/bash_completion.d/git-prompt.sh
-
+ && rm -rf /var/www/html/* 
 
 # Add additional PPAs depending on OS
 ADD sources.${OS_VERSION}/ sources
