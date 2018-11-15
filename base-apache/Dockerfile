@@ -61,12 +61,14 @@ RUN apt-get update && apt-get install -y \
     ruby-compass \
  && npm install -g npm \
  && npm install -g grunt-cli \
- && wget -O wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
- && dpkg -i --force-depends wkhtml.deb \
- && rm wkhtml.deb \
  && a2enmod rewrite \
  && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/*
+ 
+# Install wkhtmltopdf
+RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
+    && dpkg -i --force-depends /wkhtml.deb \
+    && rm /wkhtml.deb \
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
