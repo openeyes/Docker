@@ -69,7 +69,7 @@ RUN apt-get update && apt-get install -y \
 # Install wkhtmltopdf
 RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
     && dpkg -i --force-depends /wkhtml.deb \
-    && rm /wkhtml.deb \
+    && rm /wkhtml.deb
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
