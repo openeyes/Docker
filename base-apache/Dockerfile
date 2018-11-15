@@ -61,7 +61,7 @@ RUN apt-get update && apt-get install -y \
     ruby-compass \
  && npm install -g npm \
  && npm install -g grunt-cli \
- && sudo wget -O wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
+ && wget -O wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
  && dpkg -i --force-depends wkhtml.deb \
  && rm wkhtml.deb \
  && a2enmod rewrite \
