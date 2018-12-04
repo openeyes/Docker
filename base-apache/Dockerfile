@@ -19,6 +19,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
    apache2 \
    curl \
    debconf-utils \
+   flock \
    gamin \
    git-core \
    gnupg \
@@ -34,6 +35,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
    wget \
  && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/* \
+ && apt-get clean -y \
  && rm -rf /var/www/html/* 
 
 # Add additional PPAs depending on OS
@@ -64,6 +66,7 @@ RUN apt-get update && apt-get install -y \
  && npm install -g grunt-cli \
  && a2enmod rewrite \
  && apt-get autoremove -y \
+ && apt-get clean -y \
  && rm -rf /var/lib/apt/lists/*
  
 # Install wkhtmltopdf
