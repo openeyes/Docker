@@ -19,7 +19,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
    apache2 \
    curl \
    debconf-utils \
-   flock \
    gamin \
    git-core \
    gnupg \
