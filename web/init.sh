@@ -29,7 +29,7 @@ See the following urls for more info
 if [ ! -f "/var/www/html/.htaccess" ]; then
     echo Renaming .htaccess file
     mv /var/www/html/.htaccess.sample /var/www/html/.htaccess
-    sudo chown -R www-data:www-data /var/www/html/.htaccess
+    sudo chown www-data:www-data /var/www/html/.htaccess
 fi
 
 # ensure index is set
