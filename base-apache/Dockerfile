@@ -1,5 +1,5 @@
 ## Builds a base image with OS application dependencies ready installed
-## For use with OpenEyes
+## For use with OpenEyes.
 
 ARG OS_VERSION=bionic
 
@@ -35,13 +35,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
  && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/* \
  && apt-get clean -y \
- && rm -rf /var/www/html/* 
+ && rm -rf /var/www/html/*
 
 # Add additional PPAs depending on OS
 ADD sources.${OS_VERSION}/ sources
 ADD set-sources.sh set-sources.sh
 
-RUN bash set-sources.sh 
+RUN bash set-sources.sh
 
 # Install furtherapps, plus npm, using additional PPAs
 RUN apt-get update && apt-get install -y \
@@ -67,7 +67,7 @@ RUN apt-get update && apt-get install -y \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && rm -rf /var/lib/apt/lists/*
- 
+
 # Install wkhtmltopdf
 RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
     && dpkg -i --force-depends /wkhtml.deb \
