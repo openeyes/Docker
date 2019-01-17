@@ -25,6 +25,12 @@ See the following urls for more info
 
 WROOT="/var/www/html"
 
+# Set ssh key - requires mounting hosts .ssh folder to /root/.host-ssh
+mkdir -p /root/.ssh
+rsync -av /root/.host-ssh /root/.ssh --exclude known_hosts --delete 2>/dev/null
+chmod 600 /root/.ssh/*
+
+
 # Ensure .htaccess is set
 if [ ! -f "$WROOT/.htaccess" ]; then
     echo Renaming .htaccess file
