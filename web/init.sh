@@ -7,7 +7,7 @@ echo "
   / __ \                 |  ____|
  | |  | |_ __   ___ _ __ | |__  _   _  ___  ___
  | |  | | '_ \ / _ \ '_ \|  __|| | | |/ _ \/ __|
- | |__| | |_) |  __/ | | | |___| |_| |  __/\__ \ 
+ | |__| | |_) |  __/ | | | |___| |_| |  __/\__ \
   \____/| .__/ \___|_| |_|______\__, |\___||___/
         | |                      __/ |
         |_|                     |___/
@@ -23,7 +23,10 @@ See the following urls for more info
 
 "
 
-#TODO: bind mount volumes to OE folders
+# Set ssh key - requires mounting hosts .ssh folder to /root/.host-ssh
+mkdir -p /root/.ssh
+[ -d /root/.host-ssh ] && rsync -av /root/.host-ssh /root/.ssh --exclude known_hosts --delete 2>/dev/null
+chmod 600 /root/.ssh/*
 
 # Ensure .htaccess is set
 if [ ! -f "/var/www/html/.htaccess" ]; then
