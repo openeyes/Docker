@@ -1,20 +1,21 @@
 FROM appertaopeneyes/base-apache
 
-ARG BUILD_BRANCH=develop
-ARG BUILD_GITROOT
-ARG BUILD_SAMPLE=TRUE
-ARG BUILD_LOCAL_DB=FALSE
+ARG BUILD_BRANCH="develop"
+ARG BUILD_GITROOT=""
+ARG BUILD_SAMPLE="TRUE"
+ARG BUILD_LOCAL_DB="FALSE"
 	# By default we expect an external database container to be used
 	# Set this arg to TRUE to install mariadb inside the container
 ARG BUILD_EXTRA_PACKAGES=""
   # Add additional apt packages
-ARG APACHE_VERSION=5.6
+ARG APACHE_VERSION="5.6"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV TZ=Europe/London
-ENV OE_MODE=DEV
-ENV LOCAL_DB=$BUILD_LOCAL_DB
+ENV TZ="Europe/London"
+ENV OE_MODE="DEV"
+ENV LOCAL_DB=${BUILD_LOCAL_DB}
+ENV BUILD_BRANCH=$BUILD_BRANCH
 ENV SSH_PRIVATE_KEY=""
 
 ## Database connection credentials:
@@ -26,7 +27,10 @@ ENV DATABASE_NAME="openeyes"
 ENV DATABASE_PORT="3306"
 ENV DATABASE_USER="openeyes"
 ENV DATABASE_PASS="openeyes"
-ENV USE_DEMO_DATA=TRUE
+ENV USE_DEMO_DATA="TRUE"
+
+ENV GIT_USER=""
+ENV GIT_EMAIL=""
 
 ## MySQL/MariaDB root login credentials (used for install / reset scripts)
 ## It is strongly recommended that you use docker secrets or similar methods
@@ -44,9 +48,6 @@ RUN mkdir /openeyes
 # ARG CACHEBUSTER=$RANDOM
 	# Use this to prevent build cache using an old version of source files
 
-RUN ssh -oStrictHostKeyChecking=no git@github.com -T &> /dev/null
-
-
 RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mariadb-server mariadb-client \
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/* ; }
@@ -54,8 +55,8 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mar
 RUN chgrp -R www-data /openeyes
 
 # Add the init script
-COPY init.sh init.sh
-RUN chmod a+rx init.sh
+COPY init.sh /init.sh
+RUN chmod a+rx /init.sh
 
 # SETUP apache config
 # Enable display_errors and error logging for PHP, plus configure timezone
@@ -74,10 +75,14 @@ RUN chmod a+rx init.sh
 	&& sed -i "s|<Directory /var/www/html>|<Directory /openeyes>|" /etc/apache2/sites-available/000-default.conf \
   && a2enmod rewrite
 
+RUN apt-get update && apt-get install -y nano \
+        && apt-get autoremove -y \
+        && rm -rf /var/lib/apt/lists/*
+
 EXPOSE 80 3306
 
 VOLUME /openeyes
 # /cache /config /logs /protectedfiles
 
-# ENTRYPOINT
-CMD /init.sh
+ENTRYPOINT /bin/bash
+#CMD /init.sh
