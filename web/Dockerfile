@@ -2,6 +2,7 @@ FROM appertaopeneyes/base-apache
 
 ARG BUILD_BRANCH="develop"
 ARG BUILD_GITROOT=""
+ARG BUILD_WROOT="/var/www/openeyes"
 ARG BUILD_SAMPLE="TRUE"
 ARG BUILD_LOCAL_DB="FALSE"
 	# By default we expect an external database container to be used
@@ -10,7 +11,9 @@ ARG BUILD_EXTRA_PACKAGES=""
   # Add additional apt packages
 ARG APACHE_VERSION="5.6"
 
-ARG DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND="noninteractive"
+
+ENV WROOT="$BUILD_WROOT"
 
 ENV TZ="Europe/London"
 ENV OE_MODE="DEV"
@@ -43,7 +46,7 @@ ENV MYSQL_SUPER_USER="root"
 WORKDIR /
 
 # set up folders
-RUN mkdir /openeyes
+RUN mkdir $WROOT
 
 # ARG CACHEBUSTER=$RANDOM
 	# Use this to prevent build cache using an old version of source files
@@ -52,7 +55,7 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mar
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/* ; }
 
-RUN chgrp -R www-data /openeyes
+RUN chgrp -R www-data $WROOT
 
 # Add the init script
 COPY init.sh /init.sh
@@ -71,9 +74,11 @@ RUN chmod a+rx /init.sh
   && sed -i "s/^display_startup_errors = Off/display_startup_errors = On/" /etc/php/${APACHE_VERSION}/cli/php.ini \
   && sed -i "s/;error_log = php_errors.log/error_log = \/var\/log\/php_errors.log/" /etc/php/${APACHE_VERSION}/cli/php.ini \
   && sed -i "s|^;date.timezone =|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${APACHE_VERSION}/cli/php.ini \
-  && sed -i "s|DocumentRoot /var/www/html|DocumentRoot /openeyes|" /etc/apache2/sites-available/000-default.conf \
-	&& sed -i "s|<Directory /var/www/html>|<Directory /openeyes>|" /etc/apache2/sites-available/000-default.conf \
+
+  && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
   && a2enmod rewrite
+
+  # && echo "<VirtualHost *:80>\n    ServerName hostname\n    DocumentRoot $WROOT\n    <Directory $WROOT>\n    	Options FollowSymLinks\n    	AllowOverride All\n    	Order allow,deny\n    	Allow from all\n    </Directory>\n    ErrorLog /var/log/apache2/error.log\n    LogLevel warn\n    CustomLog /var/log/apache2/access.log combined\n</VirtualHost>" > /etc/apache2/sites-available/000-default.conf \
 
 RUN apt-get update && apt-get install -y nano \
         && apt-get autoremove -y \
@@ -81,8 +86,8 @@ RUN apt-get update && apt-get install -y nano \
 
 EXPOSE 80 3306
 
-VOLUME /openeyes
+VOLUME $WROOT
 # /cache /config /logs /protectedfiles
 
+#ENTRYPOINT /init.sh
 ENTRYPOINT /bin/bash
-#CMD /init.sh
