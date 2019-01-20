@@ -74,7 +74,6 @@ RUN chmod a+rx /init.sh
   && sed -i "s/^display_startup_errors = Off/display_startup_errors = On/" /etc/php/${APACHE_VERSION}/cli/php.ini \
   && sed -i "s/;error_log = php_errors.log/error_log = \/var\/log\/php_errors.log/" /etc/php/${APACHE_VERSION}/cli/php.ini \
   && sed -i "s|^;date.timezone =|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${APACHE_VERSION}/cli/php.ini \
-
   && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
   && a2enmod rewrite
 
@@ -89,5 +88,5 @@ EXPOSE 80 3306
 VOLUME $WROOT
 # /cache /config /logs /protectedfiles
 
-#ENTRYPOINT /init.sh
-ENTRYPOINT /bin/bash
+ENTRYPOINT /init.sh
+#ENTRYPOINT /bin/bash
