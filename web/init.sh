@@ -46,7 +46,7 @@ echo Testing Database: host=${DATABASE_HOST:-"localhost"} user=${MYSQL_SUPER_USE
 db_pre_exist=$( ! mysql --host=${DATABASE_HOST:-'localhost'} -u $MYSQL_SUPER_USER "$dbpassword" -e 'use '"${DATABASE_NAME:-'openeyes'};")$?
 
 # If no web files exist, check them out locally
-if [ ! -d $WROOT/protected ]; then
+if [ ! -d $WROOT/protected/modules/eyedraw/src ]; then
   ssh git@github.com -T
   [ "$?" == "1" ] && cloneroot="git@github.com:" || cloneroot="https://"
   [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
@@ -56,7 +56,11 @@ if [ ! -d $WROOT/protected ]; then
   $WROOT/protected/scripts/install-oe.sh ${BUILD_BRANCH} --accept ${db_pre_exist/1/--preserve-database}
   # update db_pre_exist, as it will now exist and we don't want to overwrite it again!
   db_pre_exist=1
+  echo "true" > /initialised.oe
 fi
+
+# If this is a new container (using existing git files), then we need to initialise the config
+[ ! -f /initialised.oe ] && { $WROOT/protected/scripts/install-oe.sh --no-checkout --accept ${db_pre_exist/1/--preserve-database} && echo "true" > /initialised.oe && db_pre_exist=1; } || :
 
 if [ $db_pre_exist = 0 ]; then
     #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
@@ -85,6 +89,8 @@ $WROOT/protected/scripts/set-profile.sh
 
 [ -z $(git config --global core.username) ] && git config --global core.username "$GIT_USER" || :
 [ -z $(git config --global core.email) ] && git config --global core.email "$GIT_EMAIL" || :
+
+##TODO: deal with image not being initialised. Set file after install. If not exist, re-run installer
 
 # Start apache
 echo "Starting apache..."
