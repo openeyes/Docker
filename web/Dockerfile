@@ -83,6 +83,8 @@ RUN apt-get update && apt-get install -y nano \
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/*
 
+RUN git config --global core.fileMode false
+
 EXPOSE 80 3306
 
 VOLUME $WROOT
