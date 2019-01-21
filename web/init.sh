@@ -87,8 +87,9 @@ $WROOT/protected/scripts/set-profile.sh
 
 [[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && $WROOT/protected/scripts/oe-fix.sh || :
 
-[ -z $(git config --global core.username) ] && git config --global core.username "$GIT_USER" || :
-[ -z $(git config --global core.email) ] && git config --global core.email "$GIT_EMAIL" || :
+
+[[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $GIT_USER"; } || :
+[[ -z $(git config --global user.email) && ! -z $GIT_EMAIL ]] && { git config --global user.email "$GIT_EMAIL" && echo "git global email set to $GIT_EMAIL"; } || :
 
 ##TODO: deal with image not being initialised. Set file after install. If not exist, re-run installer
 
