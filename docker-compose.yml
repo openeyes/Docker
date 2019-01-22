@@ -10,7 +10,7 @@ services:
       TZ: "Europe/London"
     volumes:
       - .share/mysql:/var/lib/mysql
-      
+
 # Apache and PHP server
   web:
     build: web

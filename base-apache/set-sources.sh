@@ -6,7 +6,7 @@ source sources/keys
 
 for newkey in ${gpgkeys[@]}; do
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $newkey
-done	
+done
 
 
 # Expand sources list to sources.d
