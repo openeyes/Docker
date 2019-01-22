@@ -4,7 +4,7 @@ ARG BUILD_BRANCH="develop"
 ARG BUILD_GITROOT=""
 ARG BUILD_WROOT="/var/www/openeyes"
 ARG BUILD_SAMPLE="TRUE"
-ARG BUILD_LOCAL_DB="FALSE"
+ARG BUILD_LOCAL_DB="TRUE"
 	# By default we expect an external database container to be used
 	# Set this arg to TRUE to install mariadb inside the container
 
