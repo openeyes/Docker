@@ -1,7 +1,6 @@
 FROM appertaopeneyes/base-apache
 
 ARG BUILD_BRANCH="develop"
-ARG BUILD_GITROOT=""
 ARG BUILD_WROOT="/var/www/openeyes"
 ARG BUILD_SAMPLE="TRUE"
 ARG BUILD_LOCAL_DB="FALSE"
@@ -31,6 +30,7 @@ ENV DATABASE_USER="openeyes"
 ENV DATABASE_PASS="openeyes"
 ENV USE_DEMO_DATA="TRUE"
 
+ENV GIT_ORG=""
 ENV GIT_USER=""
 ENV GIT_EMAIL=""
 
