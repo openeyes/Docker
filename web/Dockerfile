@@ -20,6 +20,8 @@ ENV OE_MODE="DEV"
 ENV LOCAL_DB=${BUILD_LOCAL_DB}
 ENV BUILD_BRANCH=$BUILD_BRANCH
 ENV SSH_PRIVATE_KEY=""
+## Used by some scripts to determine if they are runing in a container
+ENV DOCKER_CONTAINER="TRUE"
 
 ## Database connection credentials:
 ## It is STRONGLY recommended to change the password for production environments

@@ -60,7 +60,9 @@ if [ ! -d $WROOT/protected/modules/eyedraw/src ]; then
 fi
 
 # If this is a new container (using existing git files), then we need to initialise the config
-[ ! -f /initialised.oe ] && { $WROOT/protected/scripts/install-oe.sh --no-checkout --accept ${db_pre_exist/1/--preserve-database} && echo "true" > /initialised.oe && db_pre_exist=1; } || :
+initparams="--no-checkout --accept --no-migrate"
+[ "$db_pre_exist" == "1" ] initparams="$initparams --preserve-database"
+[ ! -f /initialised.oe ] && { $WROOT/protected/scripts/install-oe.sh $initparams  && echo "true" > /initialised.oe && db_pre_exist=1; } || :
 
 if [ $db_pre_exist = 0 ]; then
     #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
@@ -91,8 +93,6 @@ $WROOT/protected/scripts/set-profile.sh
 [[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $GIT_USER"; } || :
 [[ -z $(git config --global user.email) && ! -z $GIT_EMAIL ]] && { git config --global user.email "$GIT_EMAIL" && echo "git global email set to $GIT_EMAIL"; } || :
 
-##TODO: deal with image not being initialised. Set file after install. If not exist, re-run installer
-
 # Start apache
-echo "Starting apache..."
+echo "Starting opeyes apache process..."
 apachectl -DFOREGROUND
