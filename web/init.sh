@@ -67,7 +67,7 @@ fi
 
 # If this is a new container (using existing git files), then we need to initialise the config
 initparams="--no-checkout --accept --no-migrate"
-[ "$db_pre_exist" == "1" ] initparams="$initparams --preserve-database"
+[ "$db_pre_exist" == "1" ] && initparams="$initparams --preserve-database" || :
 [ ! -f /initialised.oe ] && { $WROOT/protected/scripts/install-oe.sh $initparams  && echo "true" > /initialised.oe && db_pre_exist=1; } || :
 
 if [ $db_pre_exist = 0 ]; then
