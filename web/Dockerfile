@@ -57,10 +57,9 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mar
 RUN chgrp -R www-data $WROOT
 
 # Add the init script
-COPY init.sh /init.sh
+COPY ./init.sh /init.sh
 RUN chmod a+rx /init.sh
 
 EXPOSE 80 3306
 
 ENTRYPOINT /init.sh
-#ENTRYPOINT /bin/bash

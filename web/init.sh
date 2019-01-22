@@ -24,10 +24,9 @@ See the following urls for more info
 "
 export DEBIAN_FRONTEND=noninteractive
 
-echo "Setting Timezone to ${TZ:'Europe/London'}"
-if [ ! sudo timedatectl set-timezone ${TZ:-'Europe/London'} ]; then
-  sudo ln -sf /usr/share/zoneinfo/${TZ:-Europe/London} /etc/localtime
-fi
+echo "Setting Timezone to ${TZ:-'Europe/London'}"
+sudo timedatectl set-timezone ${TZ:-'Europe/London'} 2>/dev/null
+[ $? = 1 ] && sudo ln -sf /usr/share/zoneinfo/${TZ:-Europe/London} /etc/localtime || :
 sed -i "s|.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/apache2/php.ini
 sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/cli/php.ini
 
