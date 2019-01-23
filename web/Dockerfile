@@ -50,7 +50,7 @@ RUN cd / && mkdir -p $WROOT
 
 RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mariadb-server mariadb-client \
         && apt-get autoremove -y \
-        && rm -rf /var/lib/apt/lists/* ; }
+        && rm -rf /var/lib/apt/lists/* ; } || :
 
 RUN chgrp -R www-data $WROOT
 
