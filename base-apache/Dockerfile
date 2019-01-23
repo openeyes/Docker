@@ -15,8 +15,6 @@ ENV TZ=$TIMEZONE
 
 ENV PHP_VERSION=$BUILD_PHP_VERSION
 
-WORKDIR /root/
-
 # Set timezone, add common packes, apt clean at the end to minimise layer size
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
  && apt-get update && apt-get install -y \
@@ -81,7 +79,7 @@ RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_
 
 # SETUP apache config
 # Enable display_errors and error logging for PHP, plus configure timezone
-RUN mkdir /var/log/php 2>/dev/null || : \
+RUN mkdir -p /var/log/php 2>/dev/null || : \
   && chown www-data /var/log/php \
   && chown www-data /var/log/php \
   && sed -i "s/^display_errors = Off/display_errors = On/" /etc/php/${PHP_VERSION}/apache2/php.ini \

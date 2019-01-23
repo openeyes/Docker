@@ -42,10 +42,8 @@ ENV GIT_EMAIL=""
 ENV MYSQL_ROOT_PASSWORD=""
 ENV MYSQL_SUPER_USER="root"
 
-WORKDIR /
-
 # set up folders
-RUN mkdir $WROOT
+RUN cd / && mkdir -p $WROOT
 
 # ARG CACHEBUSTER=$RANDOM
 	# Use this to prevent build cache using an old version of source files
@@ -57,7 +55,7 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mar
 RUN chgrp -R www-data $WROOT
 
 # Add the init script
-COPY ./init.sh /init.sh
+COPY init.sh /init.sh
 RUN chmod a+rx /init.sh
 
 EXPOSE 80 3306

@@ -4,8 +4,11 @@ ARG BUILD_BRANCH="develop"
 ARG BUILD_WROOT="/var/www/openeyes"
 ARG BUILD_SAMPLE="TRUE"
 ARG BUILD_LOCAL_DB="TRUE"
-	# By default we expect an external database container to be used
-	# Set this arg to TRUE to install mariadb inside the container
+
+## THE REST OF THIS FILE IS IDENTICAL TO THE MAIN web Dockerfile
+## This file exists only to workaround Docjer Hub's daft inability
+## to set build arguments!
+
 
 ARG DEBIAN_FRONTEND="noninteractive"
 
@@ -42,10 +45,8 @@ ENV GIT_EMAIL=""
 ENV MYSQL_ROOT_PASSWORD=""
 ENV MYSQL_SUPER_USER="root"
 
-WORKDIR /
-
 # set up folders
-RUN mkdir $WROOT
+RUN cd / && mkdir -p $WROOT
 
 # ARG CACHEBUSTER=$RANDOM
 	# Use this to prevent build cache using an old version of source files
@@ -57,7 +58,7 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mar
 RUN chgrp -R www-data $WROOT
 
 # Add the init script
-COPY ./init.sh /init.sh
+COPY init.sh /init.sh
 RUN chmod a+rx /init.sh
 
 EXPOSE 80 3306
