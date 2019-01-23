@@ -11,9 +11,13 @@ This project is not offically supported. It is currently maintained by @biskyt a
 **NO SUPPORT IS PROVIDED / IMPLIED**, and use is **AT YOUR OWN RISK**
 
 # Running the container
+
+**First boot may take some minutes**, but subsequent boots should take only a few seconds, particularly if you pay attention to the persistent storage section below.
+
 The simplest way to run this container is with the "allin1" version. This can be run standalone. Alternatively, you can use a separate MySQL or MariaDB server.
 
-e.g.: `docker run appertaopeneyes/web-allin1`
+e.g.: `docker run appertaopeneyes/web-allin1 -p 80:80 -p 3306:3306`
+
 
 However, you will most likely want to provide some persistent storage and other environment variables. See below...
 

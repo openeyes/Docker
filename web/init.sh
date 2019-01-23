@@ -96,6 +96,7 @@ if [ ! -f "$WROOT/index.php" ]; then
 fi
 
 $WROOT/protected/scripts/set-profile.sh
+echo "source /etc/profile.d/git-branch.sh" > ~/.bash_profile
 
 [[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && $WROOT/protected/scripts/oe-fix.sh || :
 
