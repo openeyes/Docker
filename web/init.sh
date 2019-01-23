@@ -33,14 +33,15 @@ sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php
 # if we have mysql installed in the same image, then start the service
 [ "$LOCAL_DB" == "TRUE" ] && service mysql start
 
-# Set ssh key Can be done using a secret (ssh_key), as an ENV variable (SSH_PRIVATE_KEY)
+# Set ssh key Can be done using a secret (SSH_PRIVATE_KEY), as an ENV variable (SSH_PRIVATE_KEY)
 # Or by mounting your host .ssh folder to /root/.host-ssh
-mkdir -p /root/.ssh
+mkdir -p /root/.ssh /tmp/.ssh
 idfilecontent="Host github.com\nStrictHostKeyChecking no"
-[ -d /root/.host-ssh ] && rsync -av /root/.host-ssh /root/.ssh --exclude known_hosts --delete 2>/dev/null
-[ ! -z ${SSH_PRIVATE_KEY} ] && { echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa && echo -e "$idfilecontent\nIdentityFile ~/.ssh/id_rsa" > /root/.ssh/config; }
-[ -f /run/secrets/ssh_key ] && { cp /run/secrets/ssh_key /root/.ssh/id_rsa; echo -e "$idfilecontent\nIdentityFile ~/.ssh/id_rsa" > /root/.ssh/config ; }
+[ -d /root/.host-ssh ] && rsync -av /root/.host-ssh /root/.ssh --exclude known_hosts --delete 2>/dev/null || :
+[ ! -z ${SSH_PRIVATE_KEY} ] && { echo "${SSH_PRIVATE_KEY}" > /tmp/.ssh/id_rsa && echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config; } || :
+[ -f /run/secrets/SSH_PRIVATE_KEY ] && { cp /run/secrets/SSH_PRIVATE_KEY /tmp/.ssh/id_rsa; echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config ; } || :
 chmod 600 /root/.ssh/*
+chmod 600 /tmp/.ssh/*
 
 # Use docker secret as DB password, or fall back to environment variable
 [ -f /run/secrets/DATABASE_PASS ] && dbpassword="$(</run/secrets/MYSQL_ROOT_PASSWORD)" || dbpassword=${MYSQL_ROOT_PASSWORD:-""}
@@ -58,8 +59,11 @@ if [ ! -d $WROOT/protected/modules/eyedraw/src ]; then
   [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
   echo cloning "-b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git"
   git clone -b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git $WROOT
+
   # run the standard installer script, do not overwrite database if it already exists
-  $WROOT/protected/scripts/install-oe.sh ${BUILD_BRANCH} --accept ${db_pre_exist/1/--preserve-database}
+  initparams="--no-checkout --accept"
+  [ "$db_pre_exist" == "1" ] && initparams="$initparams --preserve-database" || :
+  $WROOT/protected/scripts/install-oe.sh ${BUILD_BRANCH} --accept $initparams
   # update db_pre_exist, as it will now exist and we don't want to overwrite it again!
   db_pre_exist=1
   echo "true" > /initialised.oe

@@ -1,24 +1,39 @@
-version: '3'
+version: '3.4'
 
 services:
-
-# MariaDB server
-  db:
-    image: mariadb:10.3
-    environment:
-      MYSQL_ROOT_PASSWORD: openeyes
-      TZ: "Europe/London"
-    volumes:
-      - .share/mysql:/var/lib/mysql
-
-# Apache and PHP server
   web:
-    build: web
+    build:
+      context: ../web
+      dockerfile: Dockerfile
+      args:
+        BUILD_BRANCH: "develop"
+        BUILD_LOCAL_DB: "TRUE"
+    # cap_add, security_opt, and volume required for the image to function privileged: true
+    container_name: openeyes_web
+    environment:
+      TZ: 'Europe/London'
+      UID: '1'
+      GID: '1'
+      OE_MODE: 'DEV'
+      GIT_USER: ""
+      GIT_EMAIL: ""
+    secrets:
+      - source: SSH_PRIVATE_KEY
     ports:
-      - "88:80"
-    depends_on:
-      - db
+      - "80:80"
+      - "3306:3306"
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
     volumes:
-      - .share/html:/var/www/html/
-      - .share/etc-openeyes:/etc/openeyes
-      - .share/phpini:/usr/local/etc/php/
+      - "oe-web:/var/www/openeyes"
+      - "oe-db:/var/lib/mysql"
+
+volumes:
+  oe-web:
+  oe-db:
+
+secrets:
+  SSH_PRIVATE_KEY:
+    file: ~/.ssh/id_rsa
