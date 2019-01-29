@@ -51,7 +51,11 @@ RUN cd / && mkdir -p $WROOT
 # ARG CACHEBUSTER=$RANDOM
 	# Use this to prevent build cache using an old version of source files
 
+# If installing mysql into the image, setup mariadb and
+# bind to accept connections from remote servers
 RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mariadb-server mariadb-client \
+        && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/my.cnf \
+        && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/* ; } || :
 
