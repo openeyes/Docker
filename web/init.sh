@@ -37,7 +37,7 @@ sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php
 # Or by mounting your host .ssh folder to /root/.host-ssh
 mkdir -p /root/.ssh /tmp/.ssh
 idfilecontent="Host github.com\nStrictHostKeyChecking no"
-[ -d /root/.host-ssh ] && rsync -av /root/.host-ssh /root/.ssh --exclude known_hosts --delete 2>/dev/null || :
+[ -d /root/.host-ssh ] && rsync -av /root/.host-ssh/ /root/.ssh --exclude known_hosts --delete 2>/dev/null || :
 [ ! -z ${SSH_PRIVATE_KEY} ] && { echo "${SSH_PRIVATE_KEY}" > /tmp/.ssh/id_rsa && echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config; } || :
 [ -f /run/secrets/SSH_PRIVATE_KEY ] && { cp /run/secrets/SSH_PRIVATE_KEY /tmp/.ssh/id_rsa; echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config ; } || :
 chmod 600 /root/.ssh/*
