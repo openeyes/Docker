@@ -1,6 +1,6 @@
 FROM appertaopeneyes/base-apache
 
-ARG BUILD_BRANCH="develop"
+ARG BUILD_BRANCH="master"
 ARG BUILD_WROOT="/var/www/openeyes"
 ARG BUILD_SAMPLE="TRUE"
 ARG BUILD_LOCAL_DB="FALSE"
