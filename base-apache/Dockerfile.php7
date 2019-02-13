@@ -2,7 +2,7 @@
 ## For use with OpenEyes.
 
 ARG OS_VERSION=bionic
-ARG BUILD_PHP_VERSION="7.3"
+ARG BUILD_PHP_VERSION="7.1"
 
 FROM ubuntu:$OS_VERSION
 
