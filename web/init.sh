@@ -57,11 +57,12 @@ if [ ! -d $WROOT/protected/modules/eyedraw/src ]; then
   ssh git@github.com -T
   [ "$?" == "1" ] && cloneroot="git@github.com:" || cloneroot="https://"
   [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
-  echo cloning "-b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git"
-  git clone -b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git $WROOT
+
+  # If openeyes files don't already exist then clone them
+  [ ! -f $WROOT/protected/runtime/testme ] && { echo cloning "-b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git"; git clone -b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git $WROOT; } || :
 
   # run the standard installer script, do not overwrite database if it already exists
-  initparams="--no-checkout --accept"
+  initparams="--accept"
   [ "$db_pre_exist" == "1" ] && initparams="$initparams --preserve-database" || :
   $WROOT/protected/scripts/install-oe.sh ${BUILD_BRANCH} --accept $initparams
   # update db_pre_exist, as it will now exist and we don't want to overwrite it again!
