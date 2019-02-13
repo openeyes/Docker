@@ -1,0 +1,70 @@
+FROM appertaopeneyes/base-apache:php7
+
+ARG BUILD_BRANCH="master"
+ARG BUILD_WROOT="/var/www/openeyes"
+ARG BUILD_SAMPLE="TRUE"
+ARG BUILD_LOCAL_DB="TRUE"
+
+## THE REST OF THIS FILE IS IDENTICAL TO THE MAIN web Dockerfile
+## This file exists only to workaround Docjer Hub's daft inability
+## to set build arguments!
+
+
+ARG DEBIAN_FRONTEND="noninteractive"
+
+ENV WROOT="$BUILD_WROOT"
+
+ENV TZ="Europe/London"
+ENV OE_MODE="DEV"
+ENV LOCAL_DB=${BUILD_LOCAL_DB}
+ENV BUILD_BRANCH=$BUILD_BRANCH
+ENV SSH_PRIVATE_KEY=""
+## Used by some scripts to determine if they are runing in a container
+ENV DOCKER_CONTAINER="TRUE"
+
+## Database connection credentials:
+## It is STRONGLY recommended to change the password for production environments
+## It is STRONGLY recommended to use docker secrets for DATABASE_PASS, rather than env variables
+## defaults are localhost; openeyes; 3306; openeyes; openeyes
+ENV DATABASE_HOST="localhost"
+ENV DATABASE_NAME="openeyes"
+ENV DATABASE_PORT="3306"
+ENV DATABASE_USER="openeyes"
+ENV DATABASE_PASS="openeyes"
+ENV USE_DEMO_DATA="TRUE"
+
+ENV GIT_ORG=""
+ENV GIT_USER=""
+ENV GIT_EMAIL=""
+
+## MySQL/MariaDB root login credentials (used for install / reset scripts)
+## It is strongly recommended that you use docker secrets or similar methods
+## To set these, as opposed to using environment variables!
+## It is also STRONGLY recommended to change your root password in production
+## environments
+ENV MYSQL_ROOT_PASSWORD=""
+ENV MYSQL_SUPER_USER="root"
+
+# set up folders
+RUN cd / && mkdir -p $WROOT
+
+# ARG CACHEBUSTER=$RANDOM
+	# Use this to prevent build cache using an old version of source files
+
+# If installing mysql into the image, setup mariadb and
+# bind to accept connections from remote servers
+RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mariadb-server mariadb-client \
+        && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/my.cnf \
+        && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
+        && apt-get autoremove -y \
+        && rm -rf /var/lib/apt/lists/* ; } || :
+
+RUN chgrp -R www-data $WROOT
+
+# Add the init script
+COPY init.sh /init.sh
+RUN chmod a+rx /init.sh
+
+EXPOSE 80 3306
+
+ENTRYPOINT /init.sh
