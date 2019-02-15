@@ -27,8 +27,8 @@ export DEBIAN_FRONTEND=noninteractive
 echo "Setting Timezone to ${TZ:-'Europe/London'}"
 sudo timedatectl set-timezone ${TZ:-'Europe/London'} 2>/dev/null
 [ $? = 1 ] && sudo ln -sf /usr/share/zoneinfo/${TZ:-Europe/London} /etc/localtime || :
-sed -i "s|.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/apache2/php.ini
-sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/cli/php.ini
+sed -i "s|.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/apache2/php.ini 2>/dev/null || sed -i "s|.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php${PHP_VERSION}/apache2/php.ini
+sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/cli/php.ini 2>/dev/null || sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php${PHP_VERSION}/cli/php.ini
 
 # if we have mysql installed in the same image, then start the service
 [ "$LOCAL_DB" == "TRUE" ] && service mysql start
@@ -55,7 +55,7 @@ db_pre_exist=$( ! mysql --host=${DATABASE_HOST:-'localhost'} -u $MYSQL_SUPER_USE
 # If no web files exist, check them out locally
 if [ ! -d $WROOT/protected/modules/eyedraw/src ]; then
   ssh git@github.com -T
-  [ "$?" == "1" ] && cloneroot="git@github.com:" || cloneroot="https://"
+  [ "$?" == "1" ] && cloneroot="git@github.com:" || cloneroot="https://github.com/"
   [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
 
   # If openeyes files don't already exist then clone them
