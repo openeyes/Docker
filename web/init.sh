@@ -40,7 +40,7 @@ idfilecontent="Host github.com\nStrictHostKeyChecking no"
 [ -d /tmp/.host-ssh ] && rsync -av /tmp/.host-ssh/ /root/.ssh --exclude known_hosts --delete 2>/dev/null || :
 [ ! -z ${SSH_PRIVATE_KEY} ] && { echo "${SSH_PRIVATE_KEY}" > /tmp/.ssh/id_rsa && echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config; } || :
 [ -f /run/secrets/SSH_PRIVATE_KEY ] && { cp /run/secrets/SSH_PRIVATE_KEY /tmp/.ssh/id_rsa; echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config ; } || :
-if ! grep -Fxq "StrictHostKeyChecking no" /root/.ssh/config; then echo -e "$idfilecontent /tmp/.ssh/id_rsa" >> /root/.ssh/config; fi
+if ! grep -Fxq "StrictHostKeyChecking no" /root/.ssh/config; then echo -e "\n$idfilecontent\n /tmp/.ssh/id_rsa" >> /root/.ssh/config; fi
 true
 [ -d /root/.ssh ] && chmod 600 /root/.ssh/* || :
 [ -d /tmp/.ssh ] && chmod 600 /tmp/.ssh/* || :
