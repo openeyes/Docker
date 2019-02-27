@@ -16,7 +16,7 @@ This project is not offically supported. It is currently maintained by @biskyt a
 
 The simplest way to run this container is with the "allin1" version. This can be run standalone. Alternatively, you can use a separate MySQL or MariaDB server.
 
-e.g.: `docker run appertaopeneyes/web-allin1 -p 80:80 -p 3306:3306`
+e.g.: `docker run -it -p 80:80 -p 3306:3306 appertaopeneyes/web-allin1`
 
 
 However, you will most likely want to provide some persistent storage and other environment variables. See below...
@@ -39,7 +39,7 @@ It is recommended to create the following volumes:
 
 To e.g to run allin1 with persistent storage, use:
 
-`docker run --name "openeyes" -v oe-web:/var/www/openeyes -v oe-db:/var/lib/mysql appertaopeneyes/web-allin1`
+`docker run -it --name "openeyes" -v oe-web:/var/www/openeyes -v oe-db:/var/lib/mysql -p 80:80 -p 3306:3306 appertaopeneyes/web-allin1`
 
 You can now destroy, recreate or upgrade the container at will, without losing any data or configuration
 
