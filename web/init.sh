@@ -110,4 +110,9 @@ source /etc/profile.d/git-branch.sh
 
 # Start apache
 echo "Starting opeyes apache process..."
+echo "openeyes should now be available in your web browser on your chosen port."
+echo ""
+echo "*********************************************"
+echo "**       -= END OF STARTUP SCRIPT =-       **"
+echo "*********************************************"
 apachectl -DFOREGROUND
