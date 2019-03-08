@@ -57,7 +57,8 @@ db_pre_exist=$( ! mysql --host=${DATABASE_HOST:-'localhost'} -u $MYSQL_SUPER_USE
 if [ ! -d $WROOT/protected/modules/eyedraw/src ]; then
   ssh git@github.com -T
   [ "$?" == "1" ] && cloneroot="git@github.com:" || cloneroot="https://github.com/"
-  [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
+  # If GIT_ORG is not specified then - If using https we defualt to appertafoundation. If ussing ssh we default to openeyes
+  [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://github.com/" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
 
   # If openeyes files don't already exist then clone them
   [ ! -f $WROOT/protected/runtime/testme ] && { echo cloning "-b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git"; git clone -b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git $WROOT; } || :

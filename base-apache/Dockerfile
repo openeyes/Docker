@@ -73,7 +73,7 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 # Install wkhtmltopdf
-RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
+RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.${OS_VERSION}_amd64.deb \
     && dpkg -i --force-depends /wkhtml.deb \
     && rm /wkhtml.deb
 
