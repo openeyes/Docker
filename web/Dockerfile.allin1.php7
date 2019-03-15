@@ -49,6 +49,9 @@ ENV TZ="Europe/London"
 ENV USE_DEMO_DATA="TRUE"
 ENV WROOT="$BUILD_WROOT"
 
+# set up folders
+RUN cd / && mkdir -p $WROOT
+
 # If installing mysql into the image, setup mariadb and
 # bind to accept connections from remote servers
 RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mariadb-server mariadb-client \
