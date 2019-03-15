@@ -108,6 +108,15 @@ source /etc/profile.d/git-branch.sh
 [[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $GIT_USER"; } || :
 [[ -z $(git config --global user.email) && ! -z $GIT_EMAIL ]] && { git config --global user.email "$GIT_EMAIL" && echo "git global email set to $GIT_EMAIL"; } || :
 
+if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
+  echo ""
+  echo "************************************************************************"
+  echo "** -= This container automatically pulls from git every 30 minutes =- **"
+  echo "************************************************************************"
+
+  [ ! -f /etc/cron.d/track_git ] echo "*/30 * * * * /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" > /etc/cron.d/track_git
+
+fi
 # Start apache
 echo "Starting opeyes apache process..."
 echo "openeyes should now be available in your web browser on your chosen port."

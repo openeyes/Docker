@@ -9,15 +9,7 @@ ARG BUILD_LOCAL_DB="FALSE"
 
 ARG DEBIAN_FRONTEND="noninteractive"
 
-ENV WROOT="$BUILD_WROOT"
-
-ENV TZ="Europe/London"
-ENV OE_MODE="DEV"
-ENV LOCAL_DB=${BUILD_LOCAL_DB}
 ENV BUILD_BRANCH=$BUILD_BRANCH
-ENV SSH_PRIVATE_KEY=""
-## Used by some scripts to determine if they are runing in a container
-ENV DOCKER_CONTAINER="TRUE"
 
 ## Database connection credentials:
 ## It is STRONGLY recommended to change the password for production environments
@@ -25,14 +17,18 @@ ENV DOCKER_CONTAINER="TRUE"
 ## defaults are localhost; openeyes; 3306; openeyes; openeyes
 ENV DATABASE_HOST="localhost"
 ENV DATABASE_NAME="openeyes"
+ENV DATABASE_PASS="openeyes"
 ENV DATABASE_PORT="3306"
 ENV DATABASE_USER="openeyes"
-ENV DATABASE_PASS="openeyes"
-ENV USE_DEMO_DATA="TRUE"
+
+## Used by some scripts to determine if they are runing in a container
+ENV DOCKER_CONTAINER="TRUE"
 
 ENV GIT_ORG=""
 ENV GIT_USER=""
 ENV GIT_EMAIL=""
+
+ENV LOCAL_DB=${BUILD_LOCAL_DB}
 
 ## MySQL/MariaDB root login credentials (used for install / reset scripts)
 ## It is strongly recommended that you use docker secrets or similar methods
@@ -41,6 +37,14 @@ ENV GIT_EMAIL=""
 ## environments
 ENV MYSQL_ROOT_PASSWORD=""
 ENV MYSQL_SUPER_USER="root"
+
+ENV OE_MODE="DEV"
+ENV SSH_PRIVATE_KEY=""
+# If TRACK_NEW_GIT_COMMITS=true, then the container will run oe-update every 30 minutes as a cron job
+ENV TRACK_NEW_GIT_COMMITS="FALSE"
+ENV TZ="Europe/London"
+ENV USE_DEMO_DATA="TRUE"
+ENV WROOT="$BUILD_WROOT"
 
 # set up folders
 RUN cd / && mkdir -p $WROOT
