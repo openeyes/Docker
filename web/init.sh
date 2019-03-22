@@ -56,7 +56,8 @@ while ! mysqladmin ping -h"${DATABASE_HOST:-"localhost"}" -u $MYSQL_SUPER_USER "
 done
 echo Testing Database: host=${DATABASE_HOST:-"localhost"} user=${MYSQL_SUPER_USER:-"openeyes"} name=${DATABASE_NAME:-"openeyes"}
 
-db_pre_exist=$( ! mysql --host=${DATABASE_HOST:-'localhost'} -u $MYSQL_SUPER_USER "$dbpassword" -e 'use '"${DATABASE_NAME:-'openeyes'};")
+# NOTE: The $? on the end of the next line is very important - it converts the output to a 1 or 0
+db_pre_exist=$( ! mysql --host=${DATABASE_HOST:-'localhost'} -u $MYSQL_SUPER_USER "$dbpassword" -e 'use '"${DATABASE_NAME:-'openeyes'};")$?
 
 # If no web files exist, check them out locally
 if [ ! -d $WROOT/protected/modules/eyedraw/src ]; then
