@@ -49,8 +49,8 @@ if ! grep -Fxq "StrictHostKeyChecking no" /root/.ssh/config; then echo -e "\n$id
 [ ! -z $dbpassword ] && dbpassword="-p$dbpassword" || dbpassword="-p''" # Add -p to the beginning of the password (workaround for blank passwords)
 
 # Test to see if database is accessible. If not we will rebuild it later
-echo "Waiting for database server ${DATABASE_HOST:-'localhost'} to become available".
-while ! mysqladmin ping -h"${DATABASE_HOST:-"localhost"}" --silent; do
+echo "Waiting for database server ${DATABASE_HOST:-'localhost'} (user:$MYSQL_SUPER_USER) to become available".
+while ! mysqladmin ping -h"${DATABASE_HOST:-"localhost"}" -u $MYSQL_SUPER_USER "$dbpassword" --silent; do
     sleep 1
     echo -n "." # keep adding dots until connected
 done
