@@ -82,18 +82,6 @@ $WROOT/protected/scripts/set-profile.sh
 echo "source /etc/profile.d/git-branch.sh" > ~/.bash_profile
 source /etc/profile.d/git-branch.sh
 
-# If this is a new container (using existing git files), then we need to initialise the config
-initparams="--no-checkout --accept --no-migrate"
-[ "$db_pre_exist" == "1" ] && initparams="$initparams --preserve-database" || :
-[ ! -f /initialised.oe ] && { $WROOT/protected/scripts/install-oe.sh $initparams  && echo "true" > /initialised.oe && db_pre_exist=1; } || :
-
-if [ $db_pre_exist = 0 ]; then
-    #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
-    echo "Database host=${DATABASE_HOST:-'localhost'}; user=${MYSQL_SUPER_USER:-'openeyes'}; name=${DATABASE_NAME:-'openeyes'} was not fount. Creating a new db"
-    [ "$USE_DEMO_DATA" = "TRUE" ] && resetparams="--demo" || resetparams=""
-    $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH $resetparams
-fi
-
 # Ensure .htaccess is set
 if [ ! -f "$WROOT/.htaccess" ]; then
     echo Renaming .htaccess file
@@ -106,6 +94,18 @@ if [ ! -f "$WROOT/index.php" ]; then
     echo Renaming index.php file
     mv $WROOT/index.example.php $WROOT/index.php
     sudo chown www-data:www-data $WROOT/index.php
+fi
+
+# If this is a new container (using existing git files), then we need to initialise the config
+initparams="--no-checkout --accept --no-migrate"
+[ "$db_pre_exist" == "1" ] && initparams="$initparams --preserve-database" || :
+[ ! -f /initialised.oe ] && { $WROOT/protected/scripts/install-oe.sh $initparams  && echo "true" > /initialised.oe && db_pre_exist=1; } || :
+
+if [ $db_pre_exist = 0 ]; then
+    #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
+    echo "Database host=${DATABASE_HOST:-'localhost'}; user=${MYSQL_SUPER_USER:-'openeyes'}; name=${DATABASE_NAME:-'openeyes'} was not fount. Creating a new db"
+    [ "$USE_DEMO_DATA" = "TRUE" ] && resetparams="--demo" || resetparams=""
+    $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH $resetparams
 fi
 
 [[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && $WROOT/protected/scripts/oe-fix.sh || :
