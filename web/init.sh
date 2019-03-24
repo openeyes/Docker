@@ -78,6 +78,10 @@ if [ ! -d $WROOT/protected/modules/eyedraw/src ]; then
   echo "true" > /initialised.oe
 fi
 
+$WROOT/protected/scripts/set-profile.sh
+echo "source /etc/profile.d/git-branch.sh" > ~/.bash_profile
+source /etc/profile.d/git-branch.sh
+
 # If this is a new container (using existing git files), then we need to initialise the config
 initparams="--no-checkout --accept --no-migrate"
 [ "$db_pre_exist" == "1" ] && initparams="$initparams --preserve-database" || :
@@ -103,10 +107,6 @@ if [ ! -f "$WROOT/index.php" ]; then
     mv $WROOT/index.example.php $WROOT/index.php
     sudo chown www-data:www-data $WROOT/index.php
 fi
-
-$WROOT/protected/scripts/set-profile.sh
-echo "source /etc/profile.d/git-branch.sh" > ~/.bash_profile
-source /etc/profile.d/git-branch.sh
 
 [[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && $WROOT/protected/scripts/oe-fix.sh || :
 
