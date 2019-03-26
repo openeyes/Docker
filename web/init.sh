@@ -86,15 +86,15 @@ source /etc/profile.d/git-branch.sh
 
 # Ensure .htaccess is set
 if [ ! -f "$WROOT/.htaccess" ]; then
-    echo Renaming .htaccess file
-    mv $WROOT/.htaccess.sample $WROOT/.htaccess
+    echo Copying .htaccess file
+    cp $WROOT/.htaccess.sample $WROOT/.htaccess
     sudo chown www-data:www-data $WROOT/.htaccess
 fi
 
 # ensure index is set
 if [ ! -f "$WROOT/index.php" ]; then
-    echo Renaming index.php file
-    mv $WROOT/index.example.php $WROOT/index.php
+    echo Copying index.php file
+    cp $WROOT/index.example.php $WROOT/index.php
     sudo chown www-data:www-data $WROOT/index.php
 fi
 
