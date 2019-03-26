@@ -28,6 +28,7 @@ ENV GIT_ORG=""
 ENV GIT_USER=""
 ENV GIT_EMAIL=""
 
+ENV HOST_SUBFOLDER=""
 ENV LOCAL_DB=${BUILD_LOCAL_DB}
 
 ## MySQL/MariaDB root login credentials (used for install / reset scripts)

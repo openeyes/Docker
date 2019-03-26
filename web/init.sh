@@ -125,6 +125,18 @@ if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
   [ ! -f /etc/cron.d/track_git ] && echo "*/30 * * * * /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" > /etc/cron.d/track_git | :
 
 fi
+
+# set subfolder as alias if HOST_SUBFOLDER env is set
+# i.e. make site accessible on http://localhost/$HOST_SUBFOLDER
+if [ ! -z $HOST_SUBFOLDER ]; then
+  echo "listinging on http://localhost/$HOST_SUBFOLDER/"
+  if [ ! -f /aliasset.oe ]; then # Avoid writing to container on every reboot
+    sed -i "s|.*RewriteBase.*|RewriteBase /${HOST_SUBFOLDER}/|" $WROOT/.htaccess
+    sed -i "s|.*Alias SubFolder.*|Alias /${HOST_SUBFOLDER} $WROOT|" /etc/apache2/sites-available/000-default.conf
+    echo "set to $HOST_SUBFOLDER" > /aliasset.oe
+  fi
+fi
+
 # Start apache
 echo "Starting opeyes apache process..."
 echo "openeyes should now be available in your web browser on your chosen port."
