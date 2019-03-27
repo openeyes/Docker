@@ -130,11 +130,11 @@ fi
 # i.e. make site accessible on http://localhost/$HOST_SUBFOLDER
 if [ ! -z $HOST_SUBFOLDER ]; then
   echo "listinging on http://localhost/$HOST_SUBFOLDER/"
-  if [ ! -f /aliasset.oe ]; then # Avoid writing to container on every reboot
-    sed -i "s|.*RewriteBase.*|RewriteBase /${HOST_SUBFOLDER}/|" $WROOT/.htaccess
-    sed -i "s|.*Alias SubFolder.*|Alias /${HOST_SUBFOLDER} $WROOT|" /etc/apache2/sites-available/000-default.conf
-    echo "set to $HOST_SUBFOLDER" > /aliasset.oe
-  fi
+  # only modify the virtual host once, as we don't want to keep writing to non-persistent storage
+  [ ! -f /aliasset.oe ] && { sed -i "s|.*Alias SubFolder.*|Alias /${HOST_SUBFOLDER} $WROOT|" /etc/apache2/sites-available/000-default.conf && echo "set to $HOST_SUBFOLDER" > /aliasset.oe; } || :
+  # Reset the .htaccess on each boot, as this should be in persistent storage
+  sed -i "s|.*RewriteBase.*|RewriteBase /${HOST_SUBFOLDER}/|" $WROOT/.htaccess
+
 fi
 
 # Start apache
