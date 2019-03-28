@@ -144,4 +144,6 @@ echo ""
 echo "*********************************************"
 echo "**       -= END OF STARTUP SCRIPT =-       **"
 echo "*********************************************"
+# Send output of openeyeyes application log to stdout - for viewing with docker logs
+tail -n0 $WROOT/protected/runtime/application.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"App Log:"$0}' &
 apachectl -DFOREGROUND
