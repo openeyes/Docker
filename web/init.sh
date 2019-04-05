@@ -122,7 +122,7 @@ if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
   echo "** -= This container automatically pulls from git every 30 minutes =- **"
   echo "************************************************************************"
 
-  [ ! -f /etc/cron.d/track_git ] && echo "*/30 * * * * /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" > /etc/cron.d/track_git | :
+  [ ! -f /etc/cron.d/track_git ] && echo -e "# /etc/cron.d/track_git: Update to latest git code every 30 minutes\n*/30 * * * *   root  /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" > /etc/cron.d/track_git | :
 
 fi
 
