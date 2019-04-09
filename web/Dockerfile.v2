@@ -35,8 +35,6 @@ ENV GIT_ORG=$BUILD_ORG
 ENV GIT_USER=""
 ENV GIT_EMAIL=""
 
-ENV HOST_SUBFOLDER=""
-
 ## MySQL/MariaDB root login credentials (used for install / reset scripts)
 ## It is strongly recommended that you use docker secrets or similar methods
 ## To set these, as opposed to using environment variables!
