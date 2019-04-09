@@ -1,0 +1,176 @@
+[
+    {
+        "type": 1,
+        "title": "Openeyes",
+        "description": "OpenEyes™ is an Electronic Medical Record (EMR) application for ophthalmology, which enables clinicians to access all of the information they need about their patients in one place. We, the OpenEyes Foundation are, and always will be, clinically led, to ensure that the application only ever reflects what is most useful to our fellow clinicians. We are a registered charity, and provide the software on an open source basis, free of charge.",
+        "categories": [
+            "docker"
+        ],
+        "platform": "linux",
+        "logo": "https://s3-eu-west-1.amazonaws.com/elasticbeanstalk-eu-west-1-327595770551/OpenEyes_logo.png",
+        "image": "appertaopeneyes/web-allin1:latest",
+        "network": "traefik_proxy",
+        "name": "Please add container name here",
+        "env": [
+            {
+                "label": "Openeyes Mode",
+                "name": "OE_MODE",
+                "default": "DEV",
+                "select": [
+                    {
+                        "text": "LIVE",
+                        "value": "LIVE"
+                    },
+                    {
+                        "text": "DEVELOPMENT",
+                        "value": "DEV",
+                        "default": true
+                    }
+                ],
+                "description": "LIVE mode will hide detailed error messages from the user, not install some development components and and set a few other security hardening options"
+            },
+            {
+                "label": "Local Database",
+                "name": "LOCAL_DB",
+                "default": "TRUE",
+                "preset": true
+            },
+            {
+                "label": "Track Commits",
+                "name": "TRACK_NEW_GIT_COMMITS",
+                "default": "FALSE",
+                "select": [
+                    {
+                        "text": "Yes",
+                        "value": "TRUE",
+                        "default": true
+                    },
+                    {
+                        "text": "No",
+                        "value": "FALSE"
+                    }
+                ],
+                "description": "If Yes, will automatically update to the latest code from 'Github branch' at regular intervals"
+            },
+            {
+                "label": "Github Branch",
+                "name": "BUILD_BRANCH",
+                "default": "master",
+                "description": "If you want to deploy a specific git branch (e.g, develop, feature/OE-XXXX, etc)"
+            },
+            {
+                "label": "Use Demo Data",
+                "name": "USE_DEMO_DATA",
+                "default": "TRUE",
+                "select": [
+                    {
+                        "text": "Yes",
+                        "value": "TRUE",
+                        "default": true
+                    },
+                    {
+                        "text": "No",
+                        "value": "FALSE"
+                    }
+                ],
+                "description": "If Yes, will setup some demo patients in the worklist, add some document events, etc (runs all scripts in sample/demo)"
+            },
+            {
+                "label": "Time Zone",
+                "name": "TZ",
+                "default": "Europe/London",
+                "description": "Override the time zone (for international users) - uses standard Unix timezone identifiers"
+            }
+        ],
+        "labels": [
+            {
+                "name": "com.docker.compose.config-hash",
+                "value": "ea719b5eeead79c07fa20ad5ae3e98debd78975ce8ffafbbdb543bc5cd2acdb5"
+            },
+            {
+                "name": "com.docker.compose.container-number",
+                "value": "1"
+            },
+            {
+                "name": "com.docker.compose.oneoff",
+                "value": "False"
+            },
+            {
+                "name": "com.docker.compose.oneoff",
+                "value": "feysalh"
+            },
+            {
+                "name": "com.docker.compose.oneoff",
+                "value": "openeyes"
+            },
+            {
+                "name": "traefik.enable",
+                "value": "true"
+            },
+            {
+                "name": "traefik.frontend.priority",
+                "value": "10"
+            },
+            {
+                "name": "traefik.port",
+                "value": "80"
+            },
+            {
+                "name": "traefik.docker.network",
+                "value": "traefik_proxy"
+            },
+            {
+                "name": "traefik.frontend.headers.SSLRedirect",
+                "value": "true"
+            },
+            {
+                "name": "traefik.frontend.headers.STSSeconds",
+                "value": "315360000"
+            },
+            {
+                "name": "traefik.frontend.headers.forceSTSHeader",
+                "value": "true"
+            },
+            {
+                "name": "traefik.frontend.headers.SSLHost",
+                "value": "abehrdigital.com"
+            },
+            {
+                "name": "traefik.passHostHeader",
+                "value": "true"
+            },
+            {
+                "name": "traefik.frontend.headers.STSPreload",
+                "value": "true"
+            },
+            {
+                "name": "traefik.frontend.headers.STSPreload",
+                "value": "true"
+            },
+            {
+                "name": "traefik.frontend.headers.frameDeny",
+                "value": "true"
+            },
+            {
+                "name": "traefik.frontend.entryPoints",
+                "value": "http,https"
+            }
+        ],
+        "ports": [
+            "80/tcp",
+            "3306/tcp"
+        ],
+        "volumes": [
+            {
+                "container": "/run/secrets/SSH_PRIVATE_KEY",
+                "bind": "/home/ubuntu/.ssh/id_rsa"
+            },
+            {
+                "container": "/var/lib/mysql"
+            },
+            {
+                "container": "/var/www/openeyes"
+            }
+        ]
+    }
+]
