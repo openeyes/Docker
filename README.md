@@ -1,8 +1,6 @@
 # docker
 Docker configuration etc.
 
-THIS IS NOT READY FOR REAL WORLD USE.
-
 Currently a minimum openeyes version of 3.1 is required to use this image. Tagged versions for older openeyes versions will be created in due course.
 
 # DISCLAIMER
@@ -43,21 +41,6 @@ To e.g to run allin1 with persistent storage, use:
 
 You can now destroy, recreate or upgrade the container at will, without losing any data or configuration
 
-## Accessing the container's shell
-To access the bash shell inside the container; with the container already running use:
-
-`docker exec -it <container_name> bash -l`
-
-Note that the `-l` is very important. It starts bash in a user context. Without this switch the contents of /etc/profile.d will not be processed, and therefore none of the openeyes shortcuts (`cdoe`, `oefix`, etc) will be available.
-
-## Accessing docker volumes on a [Windows] Host
-
-If you wish to share back docker volumes to a [Windows] host. Use the following image:
-
-`
-docker run --name volume-sharer -d -v /var/lib/docker/volumes:/docker_volumes -p 139:139 -p 445:445 -v /var/run/docker.sock:/var/run/docker.sock --net=host gdiepen/volume-sharer`
-This will make all volumes available via samba on the host \\10.0.75.2 (which is the default docker for windows VM IP Address)
-
 # Access to private repos using git
 By default, this image will grab the latest openeyes files from the appertafoundation "Gold Master" openeyes repositories.
 
@@ -85,3 +68,19 @@ As a mount, you can add `-v ~/.ssh:/tmp/.host-ssh` to the run / create commands.
 
 To pass in your github username and email, use the following environment variables:
 ``-e GIT_USER="<your username>" -e GIT_EMAIL="<Your@Github.Account.Email>"``
+
+# Accessing the container's shell
+To access the bash shell inside the container; with the container already running use:
+
+`docker exec -it <container_name> bash -l`
+
+Note that the `-l` is very important. It starts bash in a user context. Without this switch the contents of /etc/profile.d will not be processed, and therefore none of the openeyes shortcuts (`cdoe`, `oefix`, etc) will be available.
+
+# Accessing docker volumes on a [Windows] Host
+
+If you wish to share back docker volumes to a [Windows] host. Use the following image:
+
+`
+docker run --rm -d -v /var/lib/docker/volumes:/docker_volumes -p 139:139 -p 445:445 -v /var/run/docker.sock:/var/run/docker.sock --net=host biskyt/volume-sharer`
+This will make all volumes available via samba on the host \\10.0.75.2 (which is the default docker for windows VM IP Address)
+
