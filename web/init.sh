@@ -125,6 +125,8 @@ $WROOT/protected/scripts/set-profile.sh
 echo "source /etc/profile.d/git-branch.sh" > ~/.bash_profile
 source /etc/profile.d/git-branch.sh
 
+[[ "$OE_PORTAL_ENABLED" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *    root  /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; } | :
+
 # Start apache
 echo "Starting opeyes apache process..."
 echo "openeyes should now be available in your web browser on your chosen port."
@@ -133,7 +135,8 @@ echo "*********************************************"
 echo "**       -= END OF STARTUP SCRIPT =-       **"
 echo "*********************************************"
 # Send output of openeyeyes application log to stdout - for viewing with docker logs
-touch $WROOT/protected/runtime/application.log
-chmod 664 $WROOT/protected/runtime/application.log
+[ ! -f $WROOT/protected/runtime/application.log ] && { touch $WROOT/protected/runtime/application.log; chmod 664 $WROOT/protected/runtime/application.log; } | :
+[ ! -f $WROOT/protected/runtime/portalexams.log ] && { touch $WROOT/protected/runtime/portalexams.log; chmod 664 $WROOT/protected/runtime/portalexams.log; } | :
 tail -n0 $WROOT/protected/runtime/application.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"App Log:"$0}' &
+tail -n0 $WROOT/protected/runtime/portalexams.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"Portal Log:"$0}' &
 apachectl -DFOREGROUND
