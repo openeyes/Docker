@@ -86,7 +86,7 @@
             {
                 "name": "traefik.enable",
                 "value": "true"
-            },
+            }
         ],
         "ports": [
             "80/tcp",
