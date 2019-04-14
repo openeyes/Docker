@@ -106,54 +106,6 @@
             {
                 "name": "traefik.enable",
                 "value": "true"
-            },
-            {
-                "name": "traefik.frontend.priority",
-                "value": "10"
-            },
-            {
-                "name": "traefik.port",
-                "value": "80"
-            },
-            {
-                "name": "traefik.docker.network",
-                "value": "traefik_proxy"
-            },
-            {
-                "name": "traefik.frontend.headers.SSLRedirect",
-                "value": "true"
-            },
-            {
-                "name": "traefik.frontend.headers.STSSeconds",
-                "value": "315360000"
-            },
-            {
-                "name": "traefik.frontend.headers.forceSTSHeader",
-                "value": "true"
-            },
-            {
-                "name": "traefik.frontend.headers.SSLHost",
-                "value": "abehrdigital.com"
-            },
-            {
-                "name": "traefik.passHostHeader",
-                "value": "true"
-            },
-            {
-                "name": "traefik.frontend.headers.STSPreload",
-                "value": "true"
-            },
-            {
-                "name": "traefik.frontend.headers.STSPreload",
-                "value": "true"
-            },
-            {
-                "name": "traefik.frontend.headers.frameDeny",
-                "value": "true"
-            },
-            {
-                "name": "traefik.frontend.entryPoints",
-                "value": "http,https"
             }
         ],
         "ports": [
