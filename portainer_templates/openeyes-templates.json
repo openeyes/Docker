@@ -82,7 +82,7 @@
                 "select": [
                     {
                         "text": "Yes",
-                        "value": "TRUE",
+                        "value": "TRUE"
                     },
                     {
                         "text": "No",
@@ -129,7 +129,7 @@
                 "label": "Docman Export directory (optional)",
                 "name": "OE_DOCMAN_EXPORT_DIRECTORY",
                 "default": "",
-                "description": "The directory that generated PDF files for Docman will be saved to. If left blank, Docman will be disabled (optional - only really needed if Enable Docman Yes)"
+                "description": "The directory that generated PDF files for Docman will be saved to. If left blank, Docman will be disabled (optional - only really needed if Enable Docmanis is Yes)"
             },
             {
                 "label": "Signature app URL (optional)",
