@@ -102,28 +102,28 @@
                 "label": "Optom portal API URL (optional)",
                 "name": "OE_PORTAL_URI",
                 "default": "https://release-api.acrossopeneyes.com",
-                "description": "To use the optom portal, you must set the correct API endpoint uri (optional - only used if Enable Optom Portal is 'Yes')"
+                "description": "To use the optom portal, you must set the correct API endpoint uri (optional - only used if Enable Optom Portal is Yes)"
             },
             {
                 "label": "Optom portal External URL (optional)",
                 "name": "OE_PORTAL_EXTERNAL_URI",
                 "default": "https://release-gateway.acrossopeneyes.com",
-                "description": "This is the URL that will get printed in letters / onscreen instructions for the optom portal (optional - only used if Enable Optom Portal is 'Yes')"
+                "description": "This is the URL that will get printed in letters / onscreen instructions for the optom portal (optional - only used if Enable Optom Portal is Yes)"
             },
             {
                 "label": "Optom portal username (optional)",
                 "name": "OE_PORTAL_USERNAME",
-                "description": "Username for optom portal user (optional - only used if Enable Optom Portal is 'Yes')"
+                "description": "Username for optom portal user (optional - only used if Enable Optom Portal is Yes)"
             },
             {
                 "label": "Optom portal password (optional)",
                 "name": "OE_PORTAL_PASSWORD",
-                "description": "Password for optom portal user (optional - only used if Enable Optom Portal is 'Yes')"
+                "description": "Password for optom portal user (optional - only used if Enable Optom Portal is Yes)"
             },
             {
                 "label": "Optom portal client secret (optional)",
                 "name": "OE_PORTAL_CLIENT_ID",
-                "description": "API Client sectret for the optom portal (optional - only used if Enable Optom Portal is 'Yes')"
+                "description": "API Client sectret for the optom portal (optional - only used if Enable Optom Portal is Yes)"
             },
             {
                 "label": "Docman Export directory (optional)",
