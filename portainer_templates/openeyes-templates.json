@@ -121,8 +121,13 @@
                 "description": "Password for optom portal user (optional - only used if Enable Optom Portal is Yes)"
             },
             {
-                "label": "Optom portal client secret (optional)",
+                "label": "Optom portal client ID (optional)",
                 "name": "OE_PORTAL_CLIENT_ID",
+                "description": "API Client ID string for the optom portal (optional - only used if Enable Optom Portal is Yes)"
+            },
+            {
+                "label": "Optom portal client secret (optional)",
+                "name": "OE_PORTAL_CLIENT_SECRET",
                 "description": "API Client sectret for the optom portal (optional - only used if Enable Optom Portal is Yes)"
             },
             {
