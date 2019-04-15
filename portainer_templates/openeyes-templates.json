@@ -129,14 +129,14 @@
                 "label": "Docman Export directory (optional)",
                 "name": "OE_DOCMAN_EXPORT_DIRECTORY",
                 "default": "",
-                "description": "The directory that generated PDF files for Docman will be saved to. If left blank, Docman will be disabled (optional - only really needed if Enable Docman 'Yes')"
+                "description": "The directory that generated PDF files for Docman will be saved to. If left blank, Docman will be disabled (optional - only really needed if Enable Docman Yes)"
             },
             {
                 "label": "Signature app URL (optional)",
                 "name": "OE_SIGNATUE_APP_URL",
                 "default": "https://dev.oesign.uk",
-                "description": "The url that users are directed to for capturing signatures -e.g., for eCVI (optional - only really needed if Enable Docman 'Yes')",
-                "preset": "true"
+                "description": "The url that users are directed to for capturing signatures -e.g., for eCVI (optional - only really needed if Enable Docman Yes)",
+                "preset": true
             },
             {
                 "label": "Time Zone",
