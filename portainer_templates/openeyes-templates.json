@@ -76,6 +76,69 @@
                 "description": "If Yes, will setup some demo patients in the worklist, add some document events, etc (runs all scripts in sample/demo)"
             },
             {
+                "label": "Enable Optom Portal",
+                "name": "OE_PORTAL_ENABLED",
+                "default": "FALSE",
+                "select": [
+                    {
+                        "text": "Yes",
+                        "value": "TRUE",
+                    },
+                    {
+                        "text": "No",
+                        "value": "FALSE",
+                        "default": true
+                    }
+                ],
+                "description": "If Yes, will enable polling for data from the optom portal every 5 minutes. Note that you must also configure the Optom Potal user, password, urls, client id and client key for this to actually work"
+            },
+            {
+                "label": "Instituiton Code (optional)",
+                "name": "OE_INSTITUTION_CODE",
+                "default": "NEW",
+                "description": "The ODS institution code for the customer (e.g, RP6 = Moorfields) (optional - only really needed if Enable Optom Portal is 'Yes')"
+            },
+            {
+                "label": "Optom portal API URL (optional)",
+                "name": "OE_PORTAL_URI",
+                "default": "https://release-api.acrossopeneyes.com",
+                "description": "To use the optom portal, you must set the correct API endpoint uri (optional - only used if Enable Optom Portal is 'Yes')"
+            },
+            {
+                "label": "Optom portal External URL (optional)",
+                "name": "OE_PORTAL_EXTERNAL_URI",
+                "default": "https://release-gateway.acrossopeneyes.com",
+                "description": "This is the URL that will get printed in letters / onscreen instructions for the optom portal (optional - only used if Enable Optom Portal is 'Yes')"
+            },
+            {
+                "label": "Optom portal username (optional)",
+                "name": "OE_PORTAL_USERNAME",
+                "description": "Username for optom portal user (optional - only used if Enable Optom Portal is 'Yes')"
+            },
+            {
+                "label": "Optom portal password (optional)",
+                "name": "OE_PORTAL_PASSWORD",
+                "description": "Password for optom portal user (optional - only used if Enable Optom Portal is 'Yes')"
+            },
+            {
+                "label": "Optom portal client secret (optional)",
+                "name": "OE_PORTAL_CLIENT_ID",
+                "description": "API Client sectret for the optom portal (optional - only used if Enable Optom Portal is 'Yes')"
+            },
+            {
+                "label": "Docman Export directory (optional)",
+                "name": "OE_DOCMAN_EXPORT_DIRECTORY",
+                "default": "",
+                "description": "The directory that generated PDF files for Docman will be saved to. If left blank, Docman will be disabled (optional - only really needed if Enable Docman 'Yes')"
+            },
+            {
+                "label": "Signature app URL (optional)",
+                "name": "OE_SIGNATUE_APP_URL",
+                "default": "https://dev.oesign.uk",
+                "description": "The url that users are directed to for capturing signatures -e.g., for eCVI (optional - only really needed if Enable Docman 'Yes')",
+                "preset": "true"
+            },
+            {
                 "label": "Time Zone",
                 "name": "TZ",
                 "default": "Europe/London",
