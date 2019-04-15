@@ -116,7 +116,7 @@ if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
   echo "** -= This container automatically pulls from git every 30 minutes =- **"
   echo "************************************************************************"
 
-  [ ! -f /etc/cron.d/track_git ] && echo -e "# /etc/cron.d/track_git: Update to latest git code every 30 minutes\n*/30 * * * *   root  /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" > /etc/cron.d/track_git | :
+  [ ! -f /etc/cron.d/track_git ] && echo -e "# /etc/cron.d/track_git: Update to latest git code every 30 minutes\n*/30 * * * *   root . /env.sh; /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" > /etc/cron.d/track_git | :
 
 fi
 
@@ -125,7 +125,10 @@ $WROOT/protected/scripts/set-profile.sh
 echo "source /etc/profile.d/git-branch.sh" > ~/.bash_profile
 source /etc/profile.d/git-branch.sh
 
-[[ "$OE_PORTAL_ENABLED" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *    root  /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; chmod 0644 /etc/cron.d/portalexams; } | :
+[[ "$OE_PORTAL_ENABLED" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *  root  . /env.sh; /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; chmod 0644 /etc/cron.d/portalexams; } | :
+
+# store environmetn to file - needed for cron jobs
+env | sed -r "s/'/\\\'/gm" | sed -r "s/^([^=]+=)(.*)\$/\1'\2'/gm" | sed 's/^/export /' > /env.sh
 
 # start cron (needed for hotlist updates + other tasks depending on configuration)
 service cron start
