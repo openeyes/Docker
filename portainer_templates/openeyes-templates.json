@@ -138,7 +138,7 @@
             },
             {
                 "label": "Signature app URL (optional)",
-                "name": "OE_SIGNATUE_APP_URL",
+                "name": "OE_SIGNATURE_APP_URL",
                 "default": "https://dev.oesign.uk",
                 "description": "The url that users are directed to for capturing signatures -e.g., for eCVI (optional - only really needed if Enable Docman Yes)",
                 "preset": true
