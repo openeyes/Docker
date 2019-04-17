@@ -154,6 +154,10 @@
             {
                 "name": "traefik.enable",
                 "value": "true"
+            },
+            {
+              "name": "traefik.port",
+              "value": "80"
             }
         ],
         "ports": [
