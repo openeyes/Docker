@@ -122,8 +122,6 @@ fi
 
 
 $WROOT/protected/scripts/set-profile.sh
-echo "source /etc/profile.d/git-branch.sh" > ~/.bash_profile
-source /etc/profile.d/git-branch.sh
 
 [[ "$OE_PORTAL_ENABLED" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *  root  . /env.sh; /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; chmod 0644 /etc/cron.d/portalexams; } | :
 

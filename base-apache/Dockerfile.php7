@@ -47,7 +47,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
 ADD sources.${OS_VERSION}/ sources
 ADD set-sources.sh set-sources.sh
 
-RUN bash set-sources.sh
+RUN bash set-sources.sh \
+    && echo ". /etc/profile" >> /root/.bashrc
 
 # Install furtherapps, plus npm, using additional PPAs
 RUN apt-get update && apt-get install -y \

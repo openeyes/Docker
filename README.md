@@ -72,9 +72,7 @@ To pass in your github username and email, use the following environment variabl
 # Accessing the container's shell
 To access the bash shell inside the container; with the container already running use:
 
-`docker exec -it <container_name> bash -l`
-
-Note that the `-l` is very important. It starts bash in a user context. Without this switch the contents of /etc/profile.d will not be processed, and therefore none of the openeyes shortcuts (`cdoe`, `oefix`, etc) will be available.
+`docker exec -it <container_name> bash`
 
 # Accessing docker volumes on a [Windows] Host
 
@@ -83,4 +81,3 @@ If you wish to share back docker volumes to a [Windows] host. Use the following 
 `
 docker run --rm -d -v /var/lib/docker/volumes:/docker_volumes -p 139:139 -p 445:445 -v /var/run/docker.sock:/var/run/docker.sock --net=host biskyt/volume-sharer`
 This will make all volumes available via samba on the host \\10.0.75.2 (which is the default docker for windows VM IP Address)
-
