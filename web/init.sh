@@ -30,9 +30,6 @@ sudo timedatectl set-timezone ${TZ:-'Europe/London'} 2>/dev/null
 sed -i "s|.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/apache2/php.ini 2>/dev/null || sed -i "s|.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php${PHP_VERSION}/apache2/php.ini
 sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/cli/php.ini 2>/dev/null || sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php${PHP_VERSION}/cli/php.ini
 
-# if we have mysql installed in the same image, then start the service
-[ "$LOCAL_DB" == "TRUE" ] && service mysql start
-
 # Set ssh key Can be done using a secret (SSH_PRIVATE_KEY), as an ENV variable (SSH_PRIVATE_KEY)
 # Or by mounting your host .ssh folder to /root/.host-ssh
 mkdir -p /root/.ssh /tmp/.ssh
@@ -41,8 +38,15 @@ idfilecontent="Host github.com\nStrictHostKeyChecking no"
 [ ! -z ${SSH_PRIVATE_KEY} ] && { echo "${SSH_PRIVATE_KEY}" > /tmp/.ssh/id_rsa && echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config; } || :
 [ -f /run/secrets/SSH_PRIVATE_KEY ] && { echo "USING DOCKER SECRET FOR SSH"; cp /run/secrets/SSH_PRIVATE_KEY /tmp/.ssh/id_rsa; echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config ; } || :
 if ! grep -Fxq "StrictHostKeyChecking no" /root/.ssh/config 2>/dev/null; then echo -e "\n$idfilecontent\n" >> /root/.ssh/config; fi
-[ `ls -1q /root/.ssh | wc -l` != 0 ] && chmod 600 /root/.ssh/* || :
-[ `ls -1q /tmp/.ssh | wc -l` != 0 ] && chmod -R 600 /tmp/.ssh/* || :
+[ $(ls -1q /root/.ssh | wc -l) != 0 ] && chmod 600 /root/.ssh/* || :
+[ $(ls -1q /tmp/.ssh | wc -l) != 0 ] && chmod -R 600 /tmp/.ssh/* || :
+[[ "$SSH_SERVER_ENABLE" == "TRUE" && ! -z "$SSH_AUTHORIZED_KEYS" ]] && echo "${SSH_AUTHORIZED_KEYS}" > /tmp/.ssh/authorized_keys || :
+
+# If SSH server is enabled, start it early in the process so that it is accessible for debugging
+[ "$SSH_SERVER_ENABLE" == "TRUE" ] && service ssh start
+
+# if we have mysql installed in the same image, then start the service
+[ "$LOCAL_DB" == "TRUE" ] && service mysql start
 
 # Use docker secret as DB password, or fall back to environment variable
 [ -f /run/secrets/DATABASE_PASS ] && dbpassword="$(</run/secrets/MYSQL_ROOT_PASSWORD)" || dbpassword=${MYSQL_ROOT_PASSWORD:-""}

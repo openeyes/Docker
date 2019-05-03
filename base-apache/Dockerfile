@@ -17,7 +17,7 @@ ENV PHP_VERSION=$BUILD_PHP_VERSION
 
 # Set timezone, add common packages, apt clean at the end to minimise layer size
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
- && apt-get update && apt-get install -y \
+ && apt-get update && apt-get install -y --no-install-recommends \
     apache2 \
     curl \
     cron \
@@ -32,6 +32,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     libreoffice-writer \
     mariadb-client \
     nano \
+    ssh \
     unzip \
     xfonts-75dpi \
     xfonts-base \
@@ -51,7 +52,7 @@ RUN bash set-sources.sh \
     && echo ". /etc/profile" >> /root/.bashrc
 
 # Install furtherapps, plus npm, using additional PPAs
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libapache2-mod-php${PHP_VERSION} \
     nodejs \
