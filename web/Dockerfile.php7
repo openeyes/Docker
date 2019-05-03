@@ -28,7 +28,6 @@ ENV GIT_ORG=""
 ENV GIT_USER=""
 ENV GIT_EMAIL=""
 
-ENV HOST_SUBFOLDER=""
 ENV LOCAL_DB=${BUILD_LOCAL_DB}
 
 ## MySQL/MariaDB root login credentials (used for install / reset scripts)
@@ -39,8 +38,20 @@ ENV LOCAL_DB=${BUILD_LOCAL_DB}
 ENV MYSQL_ROOT_PASSWORD=""
 ENV MYSQL_SUPER_USER="root"
 
+ENV OE_DOCMAN_EXPORT_DIRECTORY=""
 ENV OE_MODE="DEV"
+ENV OE_PORTAL_URI=""
+ENV OE_PORTAL_EXTERNAL_URI=""
+ENV OE_PORTAL_USERNAME=""
+ENV OE_PORTAL_PASSWORD=""
+ENV OE_PORTAL_CLIENT_ID=""
+ENV OE_PORTAL_CLIENT_SECRET=""
+ENV OE_PORTAL_ENABLED="FALSE"
+ENV OE_SIGNATURE_APP_URL=""
+ENV OE_INSTITUTION_CODE=""
+ENV SSH_AUTHORIZED_KEYS=""
 ENV SSH_PRIVATE_KEY=""
+ENV SSH_SERVER_ENABLE="FALSE"
 # If TRACK_NEW_GIT_COMMITS=true, then the container will run oe-update every 30 minutes as a cron job
 ENV TRACK_NEW_GIT_COMMITS="FALSE"
 ENV TZ="Europe/London"
@@ -55,7 +66,7 @@ RUN cd / && mkdir -p $WROOT
 
 # If installing mysql into the image, setup mariadb and
 # bind to accept connections from remote servers
-RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mariadb-server mariadb-client \
+RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y --no-install-recommends mariadb-server mariadb-client \
         && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/my.cnf \
         && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
         && apt-get autoremove -y \
