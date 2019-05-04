@@ -50,53 +50,28 @@ sudo timedatectl set-timezone ${TZ:-'Europe/London'} 2>/dev/null
 # [ -d /tmp/.ssh ] && chmod 600 /tmp/.ssh/* || :
 
 # Use docker secret as DB password, or fall back to environment variable
-[ -f /run/secrets/DATABASE_PASS ] && dbpassword="$(</run/secrets/MYSQL_ROOT_PASSWORD)" || dbpassword=${MYSQL_ROOT_PASSWORD:-""}
+[ -f /run/secrets/DATABASE_PASS ] && dbpassword="$(</run/secrets/DATABASE_PASSWORD)" || dbpassword=${DATABASE_PASSWORD:-""}
 [ ! -z $dbpassword ] && dbpassword="-p$dbpassword" || dbpassword="-p''" # Add -p to the beginning of the password (workaround for blank passwords)
 
+maxcounter=80
+counter=0
+
 # Test to see if database is accessible. If not we will rebuild it later
-echo "Waiting for $maxcounter seconds for database server ${DATABASE_HOST:-'localhost'} (user:$MYSQL_SUPER_USER) to become available".
-while ! mysqladmin ping -h"${DATABASE_HOST:-"localhost"}" -u $MYSQL_SUPER_USER "$dbpassword" --silent; do
+echo "Waiting for $maxcounter seconds for database server ${DATABASE_HOST} (user:$DATABASE_USER) to become available".
+
+while [ $(mysql --host=${DATABASE_HOST} -u $DATABASE_USER "$dbpassword" -e "use ${DATABASE_NAME:-'openeyes'};" 2>/dev/null)$? -eq 1 ]; do
     sleep 1
+    counter=$[$counter+1]
     echo -n "." # keep adding dots until connected
+    [ $counter -ge $maxcounter ] && { echo "Failed to connect to server after $maxcounter seconds, exiting."; exit 1; } || :
 done
 
-# If no project files exist, check them out locally
-# if [ ! -d $PROJROOT/bin/src/main/java/com/abehrdigital/dicomprocessor/DicomParser.class ]; then
-#   ssh git@github.com -T
-#   [ "$?" == "1" ] && cloneroot="git@github.com:" || cloneroot="https://github.com/"
-#   # If GIT_ORG is not specified then - If using https we defualt to appertafoundation. If ussing ssh we default to openeyes
-#   [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://github.com/" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
-#
-#   echo cloning "-b ${BUILD_BRANCH} $cloneroot${gitroot}/DicomProcessor.git"
-#   git clone -b ${BUILD_BRANCH} $cloneroot${gitroot}/DicomProcessor.git $PROJROOT
-#
-# fi
-
-# If container is not already initialised then run the mavern package to build project + dependencies
-# if [ ! -f /initialised.oe ]; then
-#     cd $PROJROOT
-#     mvn package
-#     echo "true" > /initialised.oe
-# fi
-
-
-[[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $GIT_USER"; } || :
-[[ -z $(git config --global user.email) && ! -z $GIT_EMAIL ]] && { git config --global user.email "$GIT_EMAIL" && echo "git global email set to $GIT_EMAIL"; } || :
-
-# if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
-#   echo ""
-#   echo "************************************************************************"
-#   echo "** -= This container automatically pulls from git every 30 minutes =- **"
-#   echo "************************************************************************"
-#
-#   [ ! -f /etc/cron.d/track_git ] && echo -e "# /etc/cron.d/track_git: Update to latest git code every 30 minutes\n*/30 * * * *   root  /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" > /etc/cron.d/track_git | :
-#
-# fi
+echo "...database ${DATABASE_NAME:-'openeyes'} found." || echo "...could not find database ${DATABASE_NAME:-'openeyes'}. It will be (re) created..."
 
 switches="-sf $PROJROOT/src/main/resources/routineLibrary/ -rq dicom_queue -sy 99999"
 
 # If a shutdown after (minutes) has been specified, then pass this to the processor. It will then run for x minutes before automatically shutting down
-[ $PROCESSOR_SHUTDOWN_AFTER > 0 ] && switches="$switches -sa $PROCESSOR_SHUTDOWN_AFTER" || :
+[ $PROCESSOR_SHUTDOWN_AFTER -gt 0 ] && switches="$switches -sa $PROCESSOR_SHUTDOWN_AFTER" || :
 
 # Start apache
 echo "Starting opeyes DicomProcessor process..."
@@ -110,4 +85,3 @@ echo "*********************************************"
 # tail -n0 $PROJROOT/protected/runtime/application.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"App Log:"$0}' &
 
 $PROJROOT/target/appassembler/bin/dicomEngine $switches
-sleep 1h

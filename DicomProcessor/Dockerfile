@@ -44,11 +44,12 @@ ENV PROCESSOR_SHUTDOWN_AFTER=0
 
 # Set timezone, add common packes, apt clean at the end to minimise layer size
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
- && apt-get update && apt-get install -y \
+ && apt-get update && apt-get install --no-install-recommends -y \
     git-core \
     mariadb-client \
     maven \
     nano \
+    ssh-client \
     sudo \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* \
