@@ -82,7 +82,7 @@ RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_
     && rm /wkhtml.deb
 
 # SETUP apache config
-# Enable display_errors and error logging for PHP, plus configure timezone
+# Enable display_errors and error logging for PHP, plus configure timezone and SSH
 RUN mkdir -p /var/log/php 2>/dev/null || : \
   && chown www-data /var/log/php \
   && chown www-data /var/log/php \
@@ -95,7 +95,8 @@ RUN mkdir -p /var/log/php 2>/dev/null || : \
   && sed -i "s/;error_log = php_errors.log/error_log = \/var\/log\/php_errors.log/" /etc/php/${PHP_VERSION}/cli/php.ini \
   && sed -i "s|^;date.timezone =|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/cli/php.ini \
   && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
-  && a2enmod rewrite
+  && a2enmod rewrite \
+  && echo "AuthorizedKeysFile     .ssh/authorized_keys /.authorized_keys /tmp/.ssh/authorized_keys /tmp/.host-ssh/authorized_keys  %h/.ssh/authorized_keys"
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
@@ -103,4 +104,4 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "unlink('composer-setup.php');" \
   && mv composer.phar /usr/local/bin/composer
 
-EXPOSE 80 3306
+EXPOSE 80 3306 22
