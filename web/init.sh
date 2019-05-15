@@ -32,15 +32,32 @@ sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php
 
 # Set ssh key Can be done using a secret (SSH_PRIVATE_KEY), as an ENV variable (SSH_PRIVATE_KEY)
 # Or by mounting your host .ssh folder to /root/.host-ssh
+# All efforts are made to avoid updating a file if it already exists - to minimise FS layers
 mkdir -p /root/.ssh /tmp/.ssh
 idfilecontent="Host github.com\nStrictHostKeyChecking no"
-[ -d /tmp/.host-ssh ] && rsync -av /tmp/.host-ssh/ /root/.ssh --exclude known_hosts --delete 2>/dev/null || :
+[ -d /tmp/.host-ssh ] && rsync -av --no-perms --no-owner --no-group /tmp/.host-ssh/ /root/.ssh --exclude known_hosts --delete 2>/dev/null || :
 [ ! -z ${SSH_PRIVATE_KEY} ] && { echo "${SSH_PRIVATE_KEY}" > /tmp/.ssh/id_rsa && echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config; } || :
-[ -f /run/secrets/SSH_PRIVATE_KEY ] && { echo "USING DOCKER SECRET FOR SSH"; cp /run/secrets/SSH_PRIVATE_KEY /tmp/.ssh/id_rsa; echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config ; } || :
+[[ -f /run/secrets/SSH_PRIVATE_KEY && ! -f /tmp/.ssh/id_rsa ]] && { echo "USING DOCKER SECRET FOR SSH"; cp /run/secrets/SSH_PRIVATE_KEY /tmp/.ssh/id_rsa; echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config ; } || :
 if ! grep -Fxq "StrictHostKeyChecking no" /root/.ssh/config 2>/dev/null; then echo -e "\n$idfilecontent\n" >> /root/.ssh/config; fi
-[ $(ls -1q /root/.ssh | wc -l) != 0 ] && chmod 600 /root/.ssh/* || :
-[ $(ls -1q /tmp/.ssh | wc -l) != 0 ] && chmod -R 600 /tmp/.ssh/* || :
-[[ "$SSH_SERVER_ENABLE" == "TRUE" && ! -z "$SSH_AUTHORIZED_KEYS" ]] && echo "${SSH_AUTHORIZED_KEYS}" > /tmp/.ssh/authorized_keys || :
+
+# Set up authorised keys for SSH server (if provided)
+[[ ! -z "$SSH_AUTHORIZED_KEYS" && ! -f /tmp/.ssh/authorized_keys ]] && echo "${SSH_AUTHORIZED_KEYS}" > /tmp/.ssh/authorized_keys || :
+[[ -f /run/secrets/SSH_AUTHORIZED_KEYS && ! -f /tmp/.ssh/authorized_keys ]] && { echo "ADDING SSH AUTHORISED KEYS"; cp /run/secrets//SSH_AUTHORIZED_KEYS /tmp/.ssh/authorized_keys; chmod 644 /tmp/.ssh/authorized_keys ; } || :
+
+# Update file permissions to 600 for SSH files if not already correct
+# Checks current permissions firs, to avoid creating unecessary extra filesystem layers
+folders600=( /root/.ssh /tmp/.ssh )
+for i in "${folders600[@]}"
+do
+  shopt -s nullglob
+  for f in $(ls "$i" | sort -V)
+  do
+      if [[ $(stat -c %a "$f") != *"600" ]]; then
+        chmod 600 "$f"
+        echo "updated permissions for $f"
+      fi
+  done
+done
 
 # If SSH server is enabled, start it early in the process so that it is accessible for debugging
 [ "$SSH_SERVER_ENABLE" == "TRUE" ] && service ssh start
@@ -85,7 +102,11 @@ fi
 initparams="--accept --no-migrate --preserve-database --no-sample"
 [[ $newinstall = 0 && -d "$WROOT/protected/modules/eyedraw/src" ]] && initparams="$initparams --no-checkout" || :
 #[ "$db_pre_exist" != "1" ] && initparams="$initparams --no-fix" || :
-[ ! -f /initialised.oe ] && { echo "Initialising new container..."; $WROOT/protected/scripts/install-oe.sh $initparams && echo "true" > /initialised.oe; } || :
+[ ! -f /initialised.oe ]; then
+  echo "Initialising new container..."
+  $WROOT/protected/scripts/install-oe.sh $initparams
+  echo "true" > /initialised.oe
+fi
 
 if [ "$db_pre_exist" != "1" ]; then
     #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
