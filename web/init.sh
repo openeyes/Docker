@@ -52,9 +52,9 @@ do
   shopt -s nullglob
   for f in $(ls "$i" | sort -V)
   do
-      if [[ $(stat -c %a "$f") != *"600" ]]; then
-        chmod 600 "$f"
-        echo "updated permissions for $f"
+      if [[ $(stat -c %a "$i"/"$f") != *"600" ]]; then
+        chmod 600 "$i"/"$f"
+        echo updated permissions for "$i"/"$f"
       fi
   done
 done
