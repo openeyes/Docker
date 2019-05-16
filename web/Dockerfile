@@ -78,6 +78,6 @@ RUN chgrp -R www-data $WROOT
 COPY init.sh /init.sh
 RUN chmod a+rx /init.sh
 
-EXPOSE 80 3306
+EXPOSE 80 3306 22
 
 ENTRYPOINT /init.sh

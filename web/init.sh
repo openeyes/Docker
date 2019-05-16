@@ -99,10 +99,10 @@ if [ ! -f $WROOT/protected/config/core/common.php ]; then
 fi
 
 # If this is a new container (using existing git files), then we need to initialise the config
-initparams="--accept --no-migrate --preserve-database --no-sample"
-[[ $newinstall = 0 && -d "$WROOT/protected/modules/eyedraw/src" ]] && initparams="$initparams --no-checkout" || :
-#[ "$db_pre_exist" != "1" ] && initparams="$initparams --no-fix" || :
-[ ! -f /initialised.oe ]; then
+
+if [ ! -f /initialised.oe ]; then
+  initparams="--accept --no-migrate --preserve-database --no-sample"
+  [[ $newinstall = 0 && -d "$WROOT/protected/modules/eyedraw/src" ]] && initparams="$initparams --no-checkout" || :
   echo "Initialising new container..."
   $WROOT/protected/scripts/install-oe.sh $initparams
   echo "true" > /initialised.oe
