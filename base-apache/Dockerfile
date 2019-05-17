@@ -96,7 +96,7 @@ RUN mkdir -p /var/log/php 2>/dev/null || : \
   && sed -i "s|^;date.timezone =|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/cli/php.ini \
   && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
   && a2enmod rewrite \
-  && echo "AuthorizedKeysFile     .ssh/authorized_keys /.authorized_keys /tmp/.ssh/authorized_keys /tmp/.host-ssh/authorized_keys  %h/.ssh/authorized_keys"
+  && echo "AuthorizedKeysFile   /.authorized_keys .ssh/authorized_keys %h/.ssh/authorized_keys" >> /etc/ssh/sshd_config
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
