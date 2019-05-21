@@ -101,7 +101,7 @@ fi
 # If this is a new container (using existing git files), then we need to initialise the config
 
 if [ ! -f /initialised.oe ]; then
-  initparams="--accept --no-migrate --preserve-database --no-sample"
+  initparams="$BUILD_BRANCH --accept --no-migrate --preserve-database --no-sample"
   [[ $newinstall = 0 && -d "$WROOT/protected/modules/eyedraw/src" ]] && initparams="$initparams --no-checkout" || :
   echo "Initialising new container..."
   $WROOT/protected/scripts/install-oe.sh $initparams
