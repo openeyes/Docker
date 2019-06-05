@@ -28,6 +28,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     cron \
     debconf-utils \
     gamin \
+    ghostscript \
     git-core \
     gnupg \
     libgamin0 \
