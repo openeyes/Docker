@@ -24,11 +24,11 @@ ENV DOCKER_CONTAINER="TRUE"
 ## It is STRONGLY recommended to change the password for production environments
 ## It is STRONGLY recommended to use docker secrets for DATABASE_PASS, rather than env variables
 ## defaults are localhost; openeyes; 3306; openeyes; openeyes
-ENV DATABASE_HOST="localhost"
-ENV DATABASE_NAME="openeyes"
-ENV DATABASE_PORT="3306"
-ENV DATABASE_USER="openeyes"
-ENV DATABASE_PASS="openeyes"
+# ENV DATABASE_HOST="localhost"
+# ENV DATABASE_NAME="openeyes"
+# ENV DATABASE_PORT="3306"
+# ENV DATABASE_USER="openeyes"
+# ENV DATABASE_PASS="openeyes"
 ENV USE_DEMO_DATA="TRUE"
 
 ENV GIT_ORG=$BUILD_ORG
@@ -49,20 +49,30 @@ RUN cd / && mkdir -p $WROOT
 # ARG CACHEBUSTER=$RANDOM
 	# Use this to prevent build cache using an old version of source files
 
-# If installing mysql into the image, setup mariadb and
+RUN mkdir -p /var/www/openeyes
+RUN mkdir /vagrant && git clone https://github.com/openeyes/oe_installer.git /vagrant \
+    && cd /vagrant && git checkout tags/v2.1.1 \
+    && cp /vagrant/install/oe* /usr/local/bin \
+    && mkdir -p /etc/openeyes \
+    && echo "username=docker" > /etc/openeyes/git.conf \
+    && echo "gitroot=$GIT_ORG" >> /etc/openeyes/git.conf \
+    && cd /
+
+# If installing mysql into the image, setup mysql and
 # bind to accept connections from remote servers
-RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mariadb-server mariadb-client \
+RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mariadb-server \
         && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/my.cnf \
         && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/* ; } || :
 
-RUN chgrp -R www-data $WROOT
+
+# RUN chgrp -R www-data $WROOT
 
 # Add the init script
-COPY init.sh /init.sh
+COPY init-v2.sh /init.sh
 RUN chmod a+rx /init.sh
 
 EXPOSE 80 3306
 
-ENTRYPOINT /init.sh
+# ENTRYPOINT /init.sh
