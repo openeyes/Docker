@@ -1,6 +1,6 @@
 FROM appertaopeneyes/base-apache:trusty
 
-ARG BUILD_BRANCH="release/v2.1.1"
+ARG BUILD_BRANCH="v2.3"
 ARG BUILD_ORG="appertafoundation"
 ARG BUILD_WROOT="/var/www/openeyes"
 ARG BUILD_SAMPLE="TRUE"
@@ -40,23 +40,11 @@ ENV GIT_EMAIL=""
 ## To set these, as opposed to using environment variables!
 ## It is also STRONGLY recommended to change your root password in production
 ## environments
-ENV MYSQL_ROOT_PASSWORD=""
+ENV MYSQL_ROOT_PASSWORD="password"
 ENV MYSQL_SUPER_USER="root"
-
-# set up folders
-RUN cd / && mkdir -p $WROOT
 
 # ARG CACHEBUSTER=$RANDOM
 	# Use this to prevent build cache using an old version of source files
-
-RUN mkdir -p /var/www/openeyes
-RUN mkdir /vagrant && git clone https://github.com/openeyes/oe_installer.git /vagrant \
-    && cd /vagrant && git checkout tags/v2.1.1 \
-    && cp /vagrant/install/oe* /usr/local/bin \
-    && mkdir -p /etc/openeyes \
-    && echo "username=docker" > /etc/openeyes/git.conf \
-    && echo "gitroot=$GIT_ORG" >> /etc/openeyes/git.conf \
-    && cd /
 
 # If installing mysql into the image, setup mysql and
 # bind to accept connections from remote servers
@@ -66,13 +54,27 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y mar
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/* ; } || :
 
+RUN mkdir /vagrant && git clone https://github.com/openeyes/oe_installer.git /vagrant \
+    && cd /vagrant && git checkout tags/v2.1.1 \
+    ## overwrite default password in oe-reset to be MYSQL_ROOT_PASSWORD \
+    && sed -i "s/dbpassword=\"password\"/dbpassword=\"${MYSQL_ROOT_PASSWORD}\"/" /vagrant/install/oe-reset \
+    && cp /vagrant/install/oe* /usr/local/bin \
+    && mkdir -p /etc/openeyes \
+    && echo "username=docker" > /etc/openeyes/git.conf \
+    && echo "gitroot=$GIT_ORG" >> /etc/openeyes/git.conf \
+    && echo "usessh=0" >> /etc/openeyes/git.conf \
+    && chmod 777 /etc/openeyes/git.conf \
+    && cd /
 
-# RUN chgrp -R www-data $WROOT
 
 # Add the init script
 COPY init-v2.sh /init.sh
-RUN chmod a+rx /init.sh
+COPY v2-oe-install.sh /install-oe.sh
+RUN chmod a+rx /init.sh && chmod a+rx /install-oe.sh \
+    && bash /install-oe.sh
 
 EXPOSE 80 3306
 
-# ENTRYPOINT /init.sh
+VOLUME [ "${WROOT}/protected/config/local", "${WROOT}/protected/files" ]
+
+ENTRYPOINT /init.sh

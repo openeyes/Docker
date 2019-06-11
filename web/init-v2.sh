@@ -104,16 +104,17 @@ if [ ! -f /initialised.oe ]; then
   initparams="$BUILD_BRANCH --accept --no-migrate --preserve-database --no-sample"
   [[ $newinstall = 0 && -d "$WROOT/protected/modules/eyedraw/src" ]] && initparams="$initparams --no-checkout" || :
   echo "Initialising new container..."
-  $WROOT/protected/scripts/install-oe.sh $initparams
+  # $WROOT/protected/scripts/install-oe.sh $initparams
+  # oe-fix
   echo "true" > /initialised.oe
 fi
 
-if [ "$db_pre_exist" != "1" ]; then
-    #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
-    echo "Database host=${DATABASE_HOST:-'localhost'}; user=${MYSQL_SUPER_USER:-'openeyes'}; name=${DATABASE_NAME:-'openeyes'} was not fount. Creating a new db"
-    [ "$USE_DEMO_DATA" = "TRUE" ] && resetparams="--demo" || resetparams=""
-    $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH $resetparams
-fi
+# if [ "$db_pre_exist" != "1" ]; then
+#     #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
+#     echo "Database host=${DATABASE_HOST:-'localhost'}; user=${MYSQL_SUPER_USER:-'openeyes'}; name=${DATABASE_NAME:-'openeyes'} was not fount. Creating a new db"
+#     [ "$USE_DEMO_DATA" = "TRUE" ] && resetparams="--demo" || resetparams=""
+#     oe-reset -b $BUILD_BRANCH $resetparams
+# fi
 
 [[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && { echo -e "\n\nDependencies not found, installing now...\n\n"; $WROOT/protected/scripts/oe-fix.sh; } || :
 
@@ -130,7 +131,7 @@ if [ ! -f "$WROOT/index.php" ]; then
     cp $WROOT/index.example.php $WROOT/index.php
     sudo chown www-data:www-data $WROOT/index.php
 fi
-
+2
 
 [[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $GIT_USER"; } || :
 [[ -z $(git config --global user.email) && ! -z $GIT_EMAIL ]] && { git config --global user.email "$GIT_EMAIL" && echo "git global email set to $GIT_EMAIL"; } || :
@@ -150,7 +151,7 @@ $WROOT/protected/scripts/set-profile.sh
 
 [[ "$OE_PORTAL_ENABLED" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *  root  . /env.sh; /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; chmod 0644 /etc/cron.d/portalexams; } | :
 
-# store environmetn to file - needed for cron jobs
+# store environment to file - needed for cron jobs
 [ ! -f /env.sh ] && { env | sed -r "s/'/\\\'/gm" | sed -r "s/^([^=]+=)(.*)\$/export \1'\2'/gm" > /env.sh; } || :
 
 # start cron (needed for hotlist updates + other tasks depending on configuration)
@@ -159,6 +160,9 @@ service cron start
 # Start apache
 echo "Starting opeyes apache process..."
 echo "openeyes should now be available in your web browser on your chosen port."
+
+#service apache2 start
+
 echo ""
 echo "*********************************************"
 echo "**       -= END OF STARTUP SCRIPT =-       **"
@@ -168,4 +172,5 @@ echo "*********************************************"
 [ ! -f $WROOT/protected/runtime/portalexams.log ] && { touch $WROOT/protected/runtime/portalexams.log; chmod 664 $WROOT/protected/runtime/portalexams.log; } | :
 tail -n0 $WROOT/protected/runtime/application.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"App Log:"$0}' &
 tail -n0 $WROOT/protected/runtime/portalexams.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"Portal Log:"$0}' &
+
 apachectl -DFOREGROUND
