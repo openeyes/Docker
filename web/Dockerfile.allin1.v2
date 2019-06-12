@@ -19,6 +19,7 @@ ENV BUILD_BRANCH=$BUILD_BRANCH
 ENV SSH_PRIVATE_KEY=""
 ## Used by some scripts to determine if they are running in a container
 ENV DOCKER_CONTAINER="TRUE"
+ENV USER=root
 
 ## Database connection credentials:
 ## It is STRONGLY recommended to change the password for production environments
