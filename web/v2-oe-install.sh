@@ -72,7 +72,6 @@ chmod 777 $WROOT/protected/runtime/cache
 
 chown -R "$USER":www-data /var/www/*
 
-hostname OpenEyesVM
 sed -i "s/envtype=AWS/envtype=DOCKER/" /etc/openeyes/env.conf
 cp -f /vagrant/install/bashrc /root/.bashrc
 usermod -a -G www-data $USER

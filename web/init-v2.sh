@@ -131,7 +131,6 @@ if [ ! -f "$WROOT/index.php" ]; then
     cp $WROOT/index.example.php $WROOT/index.php
     sudo chown www-data:www-data $WROOT/index.php
 fi
-2
 
 [[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $GIT_USER"; } || :
 [[ -z $(git config --global user.email) && ! -z $GIT_EMAIL ]] && { git config --global user.email "$GIT_EMAIL" && echo "git global email set to $GIT_EMAIL"; } || :
