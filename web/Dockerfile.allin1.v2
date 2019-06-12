@@ -75,6 +75,4 @@ RUN chmod a+rx /init.sh && chmod a+rx /install-oe.sh \
 
 EXPOSE 80 3306
 
-VOLUME [ "${WROOT}/protected/config/local", "${WROOT}/protected/files" ]
-
 ENTRYPOINT /init.sh
