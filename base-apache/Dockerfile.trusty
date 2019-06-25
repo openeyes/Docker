@@ -41,6 +41,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     xfonts-base \
     sudo \
     wget \
+    zip \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* \
   && apt-get clean -y \
