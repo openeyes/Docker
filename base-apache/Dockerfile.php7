@@ -50,7 +50,8 @@ ADD sources.${OS_VERSION}/ sources
 ADD set-sources.sh set-sources.sh
 
 RUN bash set-sources.sh \
-    && echo ". /etc/profile" >> /root/.bashrc
+    && echo ". /etc/profile" >> /root/.bashrc \
+    && echo ". /env.sh 2>/dev/null " >> /root/.bashrc
 
 # Install furtherapps, plus npm, using additional PPAs
 RUN apt-get update && apt-get install -y --no-install-recommends \
