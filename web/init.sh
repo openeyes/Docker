@@ -41,8 +41,8 @@ idfilecontent="Host github.com\nStrictHostKeyChecking no"
 if ! grep -Fxq "StrictHostKeyChecking no" /root/.ssh/config 2>/dev/null; then echo -e "\n$idfilecontent\n" >> /root/.ssh/config; fi
 
 # Set up authorised keys for SSH server (if provided)
-[[ ! -z "$SSH_AUTHORIZED_KEYS" && ! -f /.authorized_keys ]] && echo "${SSH_AUTHORIZED_KEYS}" > /.authorized_keys || :
-[[ -f /run/secrets/SSH_AUTHORIZED_KEYS && ! -f /.authorized_keys ]] && { echo "ADDING SSH AUTHORISED KEYS"; cp /run/secrets//SSH_AUTHORIZED_KEYS /.authorized_keys; chmod 644 /.authorized_keys ; } || :
+[[ ! -z "$SSH_AUTHORIZED_KEYS" && ! -f ~/.ssh/authorized_keys ]] && echo "${SSH_AUTHORIZED_KEYS}" > ~/.ssh/authorized_keys || :
+[[ -f /run/secrets/SSH_AUTHORIZED_KEYS && ! -f ~/.ssh/authorized_keys ]] && { echo "ADDING SSH AUTHORISED KEYS"; cp /run/secrets//SSH_AUTHORIZED_KEYS ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys ; } || :
 
 # Update file permissions to 600 for SSH files if not already correct
 # Checks current permissions firs, to avoid creating unecessary extra filesystem layers
