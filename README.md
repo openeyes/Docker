@@ -80,4 +80,4 @@ If you wish to share back docker volumes to a [Windows] host. Use the following 
 
 `
 docker run --rm -d -v /var/lib/docker/volumes:/docker_volumes -p 139:139 -p 445:445 -v /var/run/docker.sock:/var/run/docker.sock --net=host biskyt/volume-sharer`
-This will make all volumes available via samba on the host \\10.0.75.2 (which is the default docker for windows VM IP Address)
+This will make all volumes available via samba on the host \\\10.0.75.2 (which is the default docker for windows VM IP Address)
