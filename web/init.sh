@@ -25,10 +25,15 @@ See the following urls for more info
 export DEBIAN_FRONTEND=noninteractive
 
 echo "Setting Timezone to ${TZ:-'Europe/London'}"
-sudo timedatectl set-timezone ${TZ:-'Europe/London'} 2>/dev/null
-[ $? = 1 ] && sudo ln -sf /usr/share/zoneinfo/${TZ:-Europe/London} /etc/localtime || :
-sed -i "s|.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/apache2/php.ini 2>/dev/null || sed -i "s|.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php${PHP_VERSION}/apache2/php.ini
-sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/cli/php.ini 2>/dev/null || sed -i "s|^.*date.timezone =.*|date.timezone = ${TZ:-'Europe/London'}|" /etc/php${PHP_VERSION}/cli/php.ini
+# Set system timezone
+grep -q "$TZ" /etc/timezone >/dev/null
+[ $? = 1 ] && { ln -sf /usr/share/zoneinfo/${TZ:-Europe/London} /etc/localtime && echo ${TZ:-'Europe/London'} > /etc/timezone; } || :
+# set PHP/apache timezone (only if changed - to avoid unnecessary extra file layers)
+grep -q "$TZ" /etc/php/${PHP_VERSION}/apache2/conf.d/99-timezone.ini >/dev/null
+[ $? = 1 ] && { echo "date.timezone = ${TZ:-'Europe/London'}" > /etc/php/${PHP_VERSION}/apache2/conf.d/99-timezone.ini && echo "Updated 99-timezone.ini"; } | :
+
+# set any new PHP ini settings from PHPI_* environment variables
+/set_php_vars.sh
 
 # Set ssh key Can be done using a secret (SSH_PRIVATE_KEY), as an ENV variable (SSH_PRIVATE_KEY)
 # Or by mounting your host .ssh folder to /root/.host-ssh
@@ -166,6 +171,9 @@ echo "*********************************************"
 # Send output of openeyeyes application log to stdout - for viewing with docker logs
 [ ! -f $WROOT/protected/runtime/application.log ] && { touch $WROOT/protected/runtime/application.log; chmod 664 $WROOT/protected/runtime/application.log; } | :
 [ ! -f $WROOT/protected/runtime/portalexams.log ] && { touch $WROOT/protected/runtime/portalexams.log; chmod 664 $WROOT/protected/runtime/portalexams.log; } | :
+[ ! -f /var/log/php_errors.log ] && { touch /var/log/php_errors.log; chmod 664 /var/log/php_errors.log; } | :
 tail -n0 $WROOT/protected/runtime/application.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"App Log:"$0}' &
 tail -n0 $WROOT/protected/runtime/portalexams.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"Portal Log:"$0}' &
+tail -n0 /var/log/php_errors.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"PHP Log:"$0}' &
+
 apachectl -DFOREGROUND
