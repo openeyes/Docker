@@ -149,8 +149,17 @@ if [ ! -f "$WROOT/index.php" ]; then
 fi
 
 
-[[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $GIT_USER"; } || :
-[[ -z $(git config --global user.email) && ! -z $GIT_EMAIL ]] && { git config --global user.email "$GIT_EMAIL" && echo "git global email set to $GIT_EMAIL"; } || :
+# Set github user and email config (if provided)
+[[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $(git config --global user.name)"; } || :
+if [[ -z $(git config --global user.email) && ! -z $GIT_USER ]]; then
+  # if an email has been explicitly provided, use it. Else use default gitbug no reply user address
+  if [ ! -z $GIT_EMAIL ]; then 
+    git config --global user.email "$GIT_EMAIL"
+  else
+    git config --global user.email "${GIT_USER}@users.noreply.github.com"
+  fi 
+  echo "git global email set to $(git config --global user.email)"
+fi
 
 if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
   echo ""
