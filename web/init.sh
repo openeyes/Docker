@@ -74,12 +74,24 @@ done
 [ -f /run/secrets/DATABASE_PASS ] && dbpassword="$(</run/secrets/MYSQL_ROOT_PASSWORD)" || dbpassword=${MYSQL_ROOT_PASSWORD:-""}
 [ ! -z $dbpassword ] && dbpassword="-p$dbpassword" || dbpassword="-p''" # Add -p to the beginning of the password (workaround for blank passwords)
 
-# Test to see if database is accessible. If not we will rebuild it later
-echo "Waiting for database server ${DATABASE_HOST:-'localhost'} (user:$MYSQL_SUPER_USER) to become available".
-while ! mysqladmin ping -h"${DATABASE_HOST:-"localhost"}" -u $MYSQL_SUPER_USER "$dbpassword" --silent; do
-    sleep 1
-    echo -n "." # keep adding dots until connected
-done
+# Test to see if database and other hosts are available before continuing.
+# hosts can be specified as an environment variable WAIT_HOSTS with a comma separated list of host:port pairs to wait for
+# The wait command is from https://github.com/ufoscout/docker-compose-wait
+# The following additional options are available:
+#  # WAIT_HOSTS: comma separated list of pairs host:port for which you want to wait.
+#  # WAIT_HOSTS_TIMEOUT: max number of seconds to wait for the hosts to be available before failure. The default is 30 seconds.
+#  # WAIT_BEFORE_HOSTS: number of seconds to wait (sleep) before start checking for the hosts availability
+#  # WAIT_AFTER_HOSTS: number of seconds to wait (sleep) once all the hosts are available
+#  # WAIT_SLEEP_INTERVAL: number of seconds to sleep between retries. The default is 1 second.
+# Note that we always add the database server to the list
+[ -z $WAIT_HOSTS ] && export WAIT_HOSTS="${DATABASE_HOST:-'localhost'}:${DATABASE_PORT:-'3306'}" || export WAIT_HOSTS="${DATABASE_HOST:-'localhost'}:${DATABASE_PORT:-'3306'},$WAIT_HOSTS"
+echo "Waitng for host dependencies to become available..."
+if ! /wait = 1; then 
+  echo "Not all dependent hosts were contactable. Exiting."
+  exit; 
+fi
+
+# Test to see if database exists - if not we will (re)build it later
 echo Testing Database: host=${DATABASE_HOST:-"localhost"} user=${MYSQL_SUPER_USER:-"openeyes"} name=${DATABASE_NAME:-"openeyes"}...
 
 # NOTE: The $? on the end of the next line is very important - it converts the output to a 1 or 0
