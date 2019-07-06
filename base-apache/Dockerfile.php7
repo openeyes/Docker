@@ -2,7 +2,7 @@
 ## For use with OpenEyes.
 
 ARG OS_VERSION=bionic
-ARG BUILD_PHP_VERSION="7.1"
+ARG BUILD_PHP_VERSION="7.3"
 
 FROM ubuntu:$OS_VERSION
 
@@ -19,6 +19,7 @@ ENV PHP_VERSION=$BUILD_PHP_VERSION
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
  && apt-get update && apt-get install -y --no-install-recommends \
     apache2 \
+    bc \
     curl \
     cron \
     debconf-utils \
@@ -67,11 +68,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     php${PHP_VERSION}-imagick \
     php${PHP_VERSION}-ldap \
     php${PHP_VERSION}-mbstring \
-    php${PHP_VERSION}-mcrypt \
     php${PHP_VERSION}-mysql \
     php${PHP_VERSION}-xsl \
     php${PHP_VERSION}-zip \
     ruby-compass \
+  && [ $(echo "${PHP_VERSION} < 7.2" | bc -l) = 1 ] && apt-get install -y --no-install-recommends php${PHP_VERSION}-mcrypt || : \
   && npm install -g npm \
   && npm install -g grunt-cli \
   && a2enmod rewrite \
@@ -106,5 +107,13 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "unlink('composer-setup.php');" \
   && mv composer.phar /usr/local/bin/composer
 
+# As mcrypt was retired in php7.2, we have to complie it from pecl
+# which SIGNIFICANTLY increases image size. 
+# this is temporary until mcrypt is removed from OpenEyes (it is only used by OphCoCvi module for signature encryption)
+COPY mcrypt-pecl-install.sh mcrypt-pecl-install.sh
+# RUN [ $(echo "${PHP_VERSION} > 7.1" | bc -l) = 1 ] && bash mcrypt-pecl-install.sh || :
+
+## Note that mcrypt install for 7.2+ is currently commented out, awaiting outcome of https://github.com/openeyes/OpenEyes/issues/3421
+## run /mcrypt-pecl-install.sh manually if mcrypt is needed for testing (or uncomment the previous RUN line in the dockerfile and rebuild)
 
 EXPOSE 80 3306 22
