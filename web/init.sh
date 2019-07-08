@@ -71,7 +71,7 @@ done
 [ "$LOCAL_DB" == "TRUE" ] && service mysql start
 
 # Use docker secret as DB password, or fall back to environment variable
-[ -f /run/secrets/DATABASE_PASS ] && dbpassword="$(</run/secrets/MYSQL_ROOT_PASSWORD)" || dbpassword=${MYSQL_ROOT_PASSWORD:-""}
+[ -f /run/secrets/DATABASE_PASS ] && dbpassword="$(</run/secrets/DATABASE_PASS)" || dbpassword=${DATABASE_PASS:-""}
 [ ! -z $dbpassword ] && dbpassword="-p$dbpassword" || dbpassword="-p''" # Add -p to the beginning of the password (workaround for blank passwords)
 
 # Test to see if database and other hosts are available before continuing.
@@ -92,10 +92,10 @@ if ! /wait = 1; then
 fi
 
 # Test to see if database exists - if not we will (re)build it later
-echo Testing Database: host=${DATABASE_HOST:-"localhost"} user=${MYSQL_SUPER_USER:-"openeyes"} name=${DATABASE_NAME:-"openeyes"}...
+echo Testing Database: host=${DATABASE_HOST:-"localhost"} user=${DATABASE_USER:-"openeyes"} name=${DATABASE_NAME:-"openeyes"}...
 
 # NOTE: The $? on the end of the next line is very important - it converts the output to a 1 or 0
-db_pre_exist=$( ! mysql --host=${DATABASE_HOST:-'localhost'} -u $MYSQL_SUPER_USER "$dbpassword" -e "use ${DATABASE_NAME:-'openeyes'};" 2>/dev/null)$?
+db_pre_exist=$( ! mysql -A --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "use ${DATABASE_NAME:-'openeyes'};" 2>/dev/null)$?
 
 [ "$db_pre_exist" = "1" ] && echo "...database ${DATABASE_NAME:-'openeyes'} found." || echo "...could not find database ${DATABASE_NAME:-'openeyes'}. It will be (re) created..."
 

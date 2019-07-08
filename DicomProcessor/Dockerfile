@@ -66,6 +66,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
 
   # Add the init script
   COPY init.sh /init.sh
-  RUN chmod a+rx /init.sh
+  COPY wait /wait
+  RUN chmod a+rx /init.sh && chmod a+rx /wait
 
   ENTRYPOINT /init.sh
