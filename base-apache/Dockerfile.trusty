@@ -3,8 +3,6 @@
 
 ARG OS_VERSION=trusty
 ARG BUILD_PHP_VERSION="5"
-ARG BUILD_BRANCH="release/v2.1.1"
-ARG BUILD_ORG="appertafoundation"
 
 FROM ubuntu:$OS_VERSION
 
@@ -16,9 +14,9 @@ ARG TIMEZONE="Europe/London"
 ARG BUILD_ORG
 ARG BUILD_BRANCH
 
-ENV TZ=$TIMEZONE
-
 ENV PHP_VERSION=$BUILD_PHP_VERSION
+ENV TZ=$TIMEZONE
+ENV USER=root
 
 # Set timezone, add common packes, apt clean at the end to minimise layer size
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
@@ -28,6 +26,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     cron \
     debconf-utils \
     gamin \
+    ghostscript \
     git-core \
     gnupg \
     libgamin0 \
@@ -42,6 +41,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     xfonts-base \
     sudo \
     wget \
+    zip \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* \
   && apt-get clean -y \
@@ -53,65 +53,69 @@ ADD sources.${OS_VERSION}/ sources
 ADD set-sources.sh set-sources.sh
 
 RUN bash set-sources.sh \
-    && echo ". /etc/profile" >> /root/.bashrc
+    && echo ". /etc/profile" >> /root/.bashrc \
+    && echo ". /env.sh 2>/dev/null " >> /root/.bashrc
+    
 
-# Clone and run the install-system.sh script for last v2 release
-RUN cd ~/ && git clone https://github.com/$BUILD_ORG/oe_installer -b $BUILD_BRANCH \
-  && apt-get update \
-	&& ~/oe_installer/install/install-system.sh -d \
-	&& apt-get autoremove -y \
-	&& rm -rf /var/lib/apt/lists/*
+# # Clone and run the install-system.sh script for last v2 release
+# RUN cd ~/ && git clone https://github.com/$BUILD_ORG/oe_installer -b $BUILD_BRANCH \
+#   && apt-get update \
+# 	&& ~/oe_installer/install/install-system.sh -d \
+# 	&& apt-get autoremove -y \
+# 	&& rm -rf /var/lib/apt/lists/*
 
-# # Install furtherapps, plus npm, using additional PPAs
-# RUN apt-get update && apt-get install -y \
-# #    ffmpeg \
-#     libapache2-mod-php${PHP_VERSION} \
-#     nodejs \
-#     npm \
-#     php${PHP_VERSION} \
-#     php${PHP_VERSION}-cli \
-#     php${PHP_VERSION}-curl \
-#     php${PHP_VERSION}-gd \
-#     php${PHP_VERSION}-imagick \
-#     php${PHP_VERSION}-ldap \
-# #    php${PHP_VERSION}-mbstring \
-#     php${PHP_VERSION}-mcrypt \
-#     php${PHP_VERSION}-mysql \
-#     php${PHP_VERSION}-xsl \
-# #    php${PHP_VERSION}-zip \
-#     ruby-compass \
-# #  && npm install -g npm \
-# #  && npm install -g grunt-cli \
-#   && a2enmod rewrite \
-#   && apt-get autoremove -y \
-#   && apt-get clean -y \
-#   && rm -rf /var/lib/apt/lists/*
-#
-# # Install wkhtmltopdf
-# RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.${OS_VERSION}_amd64.deb \
-#     && dpkg -i --force-depends /wkhtml.deb \
-#     && rm /wkhtml.deb
+# Install furtherapps, plus npm, using additional PPAs
+RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - \ 
+    && apt-get update && apt-get install -y \
+#    ffmpeg \
+    libapache2-mod-php${PHP_VERSION} \
+    nodejs \
+    # npm \
+    php${PHP_VERSION} \
+    php${PHP_VERSION}-cli \
+    php${PHP_VERSION}-curl \
+    php${PHP_VERSION}-gd \
+    php${PHP_VERSION}-imagick \
+    php${PHP_VERSION}-ldap \
+    php${PHP_VERSION}-mcrypt \
+    php${PHP_VERSION}-mysql \
+    php${PHP_VERSION}-xsl \
+    libapache2-mod-php${PHP_VERSION} \
+    ruby-compass \
+  && npm install -g npm \
+  && npm install -g grunt-cli \
+  && a2enmod rewrite \
+  && apt-get autoremove -y \
+  && apt-get clean -y \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install wkhtmltopdf
+RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.${OS_VERSION}_amd64.deb \
+    && dpkg -i --force-depends /wkhtml.deb \
+    && rm /wkhtml.deb
 
 # SETUP apache config
 # Enable display_errors and error logging for PHP, plus configure timezone
-# RUN mkdir -p /var/log/php 2>/dev/null || : \
-#   && chown www-data /var/log/php \
-#   && chown www-data /var/log/php \
-#   && sed -i "s/^display_errors = Off/display_errors = On/" /etc/php/${PHP_VERSION}/apache2/php.ini \
-#   && sed -i "s/^display_startup_errors = Off/display_startup_errors = On/" /etc/php/${PHP_VERSION}/apache2/php.ini \
-#   && sed -i "s|^;date.timezone =|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/apache2/php.ini \
-#   && sed -i "s/;error_log = php_errors.log/error_log = \/var\/log\/php_errors.log/" /etc/php/${PHP_VERSION}/apache2/php.ini \
-#   && sed -i "s/^display_errors = Off/display_errors = On/" /etc/php/${PHP_VERSION}/cli/php.ini \
-#   && sed -i "s/^display_startup_errors = Off/display_startup_errors = On/" /etc/php/${PHP_VERSION}/cli/php.ini \
-#   && sed -i "s/;error_log = php_errors.log/error_log = \/var\/log\/php_errors.log/" /etc/php/${PHP_VERSION}/cli/php.ini \
-#   && sed -i "s|^;date.timezone =|date.timezone = ${TZ:-'Europe/London'}|" /etc/php/${PHP_VERSION}/cli/php.ini \
-#   && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
-#   && a2enmod rewrite
+RUN mkdir -p /var/log/php 2>/dev/null || : \
+  && chown www-data /var/log/php \
+  && chown www-data /var/log/php \
+  && sed -i "s/^display_errors = Off/display_errors = On/" /etc/php${PHP_VERSION}/apache2/php.ini \
+  && sed -i "s/^display_startup_errors = Off/display_startup_errors = On/" /etc/php${PHP_VERSION}/apache2/php.ini \
+  && sed -i "s|^;date.timezone =|date.timezone = ${TZ:-'Europe/London'}|" /etc/php${PHP_VERSION}/apache2/php.ini \
+  && sed -i "s/;error_log = php_errors.log/error_log = \/var\/log\/php_errors.log/" /etc/php${PHP_VERSION}/apache2/php.ini \
+  && sed -i "s/^display_errors = Off/display_errors = On/" /etc/php${PHP_VERSION}/cli/php.ini \
+  && sed -i "s/^display_startup_errors = Off/display_startup_errors = On/" /etc/php${PHP_VERSION}/cli/php.ini \
+  && sed -i "s/;error_log = php_errors.log/error_log = \/var\/log\/php_errors.log/" /etc/php${PHP_VERSION}/cli/php.ini \
+  && sed -i "s|^;date.timezone =|date.timezone = ${TZ:-'Europe/London'}|" /etc/php${PHP_VERSION}/cli/php.ini \
+  && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
+  && a2enmod rewrite
 
-# # Install composer
-# RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-#   && php composer-setup.php \
-#   && php -r "unlink('composer-setup.php');" \
-#   && mv composer.phar /usr/local/bin/composer
+# Install composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+  && php composer-setup.php \
+  && php -r "unlink('composer-setup.php');" \
+  && mv composer.phar /usr/local/bin/composer
+
+CMD /bin/bash
 
 EXPOSE 80 3306

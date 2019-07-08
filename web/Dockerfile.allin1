@@ -78,8 +78,11 @@ RUN chgrp -R www-data $WROOT
 
 # Add the init script
 COPY init.sh /init.sh
-RUN chmod a+rx /init.sh
+COPY wait /wait
+RUN chmod a+rx /init.sh \
+    && chmod a+rx /wait
 
-EXPOSE 80 3306
+
+EXPOSE 80 3306 22
 
 ENTRYPOINT /init.sh
