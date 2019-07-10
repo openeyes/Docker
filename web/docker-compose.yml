@@ -1,0 +1,100 @@
+version: '3.4'
+
+services:
+  db:
+    image: mariadb:10.1
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      TZ: "Europe/London"
+    stdin_open: true
+    tty: true
+    ports:
+      - "3306:3306"
+    volumes:
+      - "oe-db:/var/lib/mysql"
+  
+  web_7:
+    image: appertaopeneyes/web:php7
+    container_name: openeyes_web_7
+    environment:
+      GIT_USER: ${GIT_USER:?'Please set your github user id in .env file'}
+      TZ: 'Europe/London'
+      UID: '1'
+      GID: '1'
+      OE_MODE: 'DEV'
+      OE_INSTITUTION_CODE: NEW
+      OE_PORTAL_URI: ${OE_PORTAL_URI}
+      OE_PORTAL_EXTERNAL_URI: ${OE_PORTAL_EXTERNAL_URI}
+      OE_PORTAL_USERNAME: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
+      OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
+      OE_PORTAL_ENABLED: "FALSE"
+      SSH_SERVER_ENABLE: "TRUE"
+      DATABASE_HOST: "db"
+      MYSQL_ROOT_PASSWORD: example
+      PHPI_TEST_SETTING: test-123
+      WAIT_HOSTS: "web_5:80"
+      WAIT_HOSTS_TIMEOUT: "300"
+    secrets:
+      - source: SSH_PRIVATE_KEY
+      - source: SSH_AUTHORIZED_KEYS
+    ports:
+      - "8888:80"
+      - "22:22"
+    stdin_open: true
+    tty: true
+    volumes:
+      - "oe-web:/var/www/openeyes"
+    depends_on: 
+     - "db"
+     - "web_5"
+    hostname: oe-web-php7
+
+  web_5:
+    image: appertaopeneyes/web:latest
+    container_name: openeyes_web_5
+    environment:
+      GIT_USER: ${GIT_USER:?'Please set your github user id in .env file'}
+      TZ: 'Europe/London'
+      UID: '1'
+      GID: '1'
+      OE_MODE: 'DEV'
+      OE_INSTITUTION_CODE: NEW
+      OE_PORTAL_URI: ${OE_PORTAL_URI}
+      OE_PORTAL_EXTERNAL_URI: ${OE_PORTAL_EXTERNAL_URI}
+      OE_PORTAL_USERNAME: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
+      OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
+      OE_PORTAL_ENABLED: "FALSE"
+      SSH_SERVER_ENABLE: "TRUE"
+      DATABASE_HOST: "db"
+      MYSQL_ROOT_PASSWORD: example
+      PHPI_TEST_SETTING: test-123
+      WAIT_HOSTS_TIMEOUT: "300"
+    secrets:
+      - source: SSH_PRIVATE_KEY
+      - source: SSH_AUTHORIZED_KEYS
+    ports:
+      - "80:80"
+      - "23:22"
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
+    volumes:
+      - "oe-web:/var/www/openeyes"
+    depends_on: 
+      - db
+    hostname: oe-web-php5
+
+volumes:
+  oe-web:
+  oe-db:
+
+secrets:
+  SSH_PRIVATE_KEY:
+    file: ~/.ssh/id_rsa
+  SSH_AUTHORIZED_KEYS:
+    file: ~/.ssh/id_rsa.pub
