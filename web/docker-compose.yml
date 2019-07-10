@@ -35,7 +35,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       PHPI_TEST_SETTING: test-123
       WAIT_HOSTS: "web_5:80"
-      WAIT_HOSTS_TIMEOUT: "1000"
+      WAIT_HOSTS_TIMEOUT: "3000"
     secrets:
       - source: SSH_PRIVATE_KEY
       - source: SSH_AUTHORIZED_KEYS
