@@ -83,4 +83,4 @@ RUN chmod a+rx /init.sh \
 
 EXPOSE 80 3306 22
 
-ENTRYPOINT /init.sh
+ENTRYPOINT ["/init.sh"]

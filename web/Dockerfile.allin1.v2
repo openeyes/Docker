@@ -76,4 +76,4 @@ RUN chmod a+rx /init.sh && chmod a+rx /install-oe.sh \
 
 EXPOSE 80 3306
 
-ENTRYPOINT /init.sh
+ENTRYPOINT ["/init.sh"]
