@@ -4,7 +4,7 @@ services:
   db:
     image: mariadb:10.1
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       TZ: "Europe/London"
     stdin_open: true
     tty: true
@@ -32,7 +32,7 @@ services:
       OE_PORTAL_ENABLED: "FALSE"
       SSH_SERVER_ENABLE: "TRUE"
       DATABASE_HOST: "db"
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       PHPI_TEST_SETTING: test-123
       WAIT_HOSTS: "web_5:80"
       WAIT_HOSTS_TIMEOUT: "300"
@@ -70,7 +70,7 @@ services:
       OE_PORTAL_ENABLED: "FALSE"
       SSH_SERVER_ENABLE: "TRUE"
       DATABASE_HOST: "db"
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       PHPI_TEST_SETTING: test-123
       WAIT_HOSTS_TIMEOUT: "300"
     secrets:
