@@ -40,7 +40,7 @@ services:
       - source: SSH_PRIVATE_KEY
       - source: SSH_AUTHORIZED_KEYS
     ports:
-      - "8888:80"
+      - "7777:80"
       - "22:22"
     stdin_open: true
     tty: true
