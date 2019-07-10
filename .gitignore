@@ -2,3 +2,5 @@ share
 local//
 /local
 local/*
+web/.env
+*/.env
