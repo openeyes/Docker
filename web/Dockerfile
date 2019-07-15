@@ -55,6 +55,7 @@ ENV SSH_SERVER_ENABLE="FALSE"
 # If TRACK_NEW_GIT_COMMITS=true, then the container will run oe-update every 30 minutes as a cron job
 ENV TRACK_NEW_GIT_COMMITS="FALSE"
 ENV TZ="Europe/London"
+ENV UNIT_TEST_SUITE=""
 ENV USE_DEMO_DATA="TRUE"
 ENV WROOT="$BUILD_WROOT"
 

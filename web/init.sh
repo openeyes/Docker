@@ -197,4 +197,10 @@ tail -n0 $WROOT/protected/runtime/application.log -F | awk '/^==> / {a=substr($0
 tail -n0 $WROOT/protected/runtime/portalexams.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"Portal Log:"$0}' &
 tail -n0 /var/log/php_errors.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"PHP Log:"$0}' &
 
-apachectl -DFOREGROUND
+if [ $OE_MODE = "TEST" ]; then 
+  echo "STARING TESTS. $UNIT_TEST_SUITE"
+  $WROOT/protected/scripts/oe-unit-tests.sh
+  exit $?
+else
+  apachectl -DFOREGROUND
+fi

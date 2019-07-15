@@ -1,4 +1,4 @@
-.env
 portainerdata/*
 traefik/*
 /traefikshared/.htpasswd
+.env
