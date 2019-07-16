@@ -81,3 +81,17 @@ If you wish to share back docker volumes to a [Windows] host. Use the following 
 `
 docker run --rm -d -v /var/lib/docker/volumes:/docker_volumes -p 139:139 -p 445:445 -v /var/run/docker.sock:/var/run/docker.sock --net=host biskyt/volume-sharer`
 This will make all volumes available via samba on the host \\\10.0.75.2 (which is the default docker for windows VM IP Address)
+
+# docker-compose
+An example compose file is provided in the [web folder](https://github.com/openeyes/Docker/tree/master/web). Note that this expects you to provide a .env file for some of the environment variables. E.g, Create a file names `.env` in the same folder as the compose file. Inside .env, add Environment varibales (one per line). E.g,
+```
+GIT_USER=<your github username>
+```
+When you run `docker-compose up` the contents of `.env` will be read and the variables inserted in the relevant places in the compose file.
+
+The example compose file creates 3x containers:
+* A MariaDB database container (on port 3306)
+* A PHP5.6 version of the openeyes web container (on port 80)
+* A PHP7.3 version of the openeyes container (on port 7777)
+
+This demonstrates how 2 instances can connect to the same database and use the same code files. It also allows dual PHP version testing, while we migrate to PHP7.
