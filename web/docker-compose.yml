@@ -1,5 +1,8 @@
 version: '3.4'
 
+## PLEASE provide values for relevant environment variables (e.g, GIT_USER) in an accompanyiong .env file
+## the .env file will not be checked in to version control
+
 services:
   db:
     image: mariadb:10.1
@@ -12,6 +15,10 @@ services:
       - "3306:3306"
     volumes:
       - "oe-db:/var/lib/mysql"
+    command: 
+      # Changing log_file_size to allow lightning image processing of larger document image events
+      - "--innodb_log_file_size"
+      - "128M"
   
   web_7:
     image: appertaopeneyes/web:php7
