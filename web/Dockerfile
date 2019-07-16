@@ -49,13 +49,14 @@ ENV OE_PORTAL_CLIENT_SECRET=""
 ENV OE_PORTAL_ENABLED="FALSE"
 ENV OE_SIGNATURE_APP_URL=""
 ENV OE_INSTITUTION_CODE=""
+# Used to pass extra command line switches to phpunit when running in test mode
+ENV PHPUNIT_CLI_SWITCHES=""
 ENV SSH_AUTHORIZED_KEYS=""
 ENV SSH_PRIVATE_KEY=""
 ENV SSH_SERVER_ENABLE="FALSE"
 # If TRACK_NEW_GIT_COMMITS=true, then the container will run oe-update every 30 minutes as a cron job
 ENV TRACK_NEW_GIT_COMMITS="FALSE"
 ENV TZ="Europe/London"
-ENV UNIT_TEST_SUITE=""
 ENV USE_DEMO_DATA="TRUE"
 ENV WROOT="$BUILD_WROOT"
 
