@@ -42,6 +42,7 @@ ENV MYSQL_SUPER_USER="root"
 
 ENV OE_DOCMAN_EXPORT_DIRECTORY=""
 ENV OE_MODE="DEV"
+ENV OE_FORCE_MIGRATE="FALSE"
 ENV OE_PORTAL_URI=""
 ENV OE_PORTAL_EXTERNAL_URI=""
 ENV OE_PORTAL_USERNAME=""
@@ -74,9 +75,20 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y --n
         && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/my.cnf \
         && sed -i "s/\s*bind-address\s*=\s*127\.0\.0\.1/bind-address    = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
         && apt-get autoremove -y \
-        && rm -rf /var/lib/apt/lists/* ; } || :
+        && rm -rf /var/lib/apt/lists/* \ 
+        && rm -rf /tmp/* ; } || : 
+        
 
 RUN chgrp -R www-data $WROOT
+
+# pre-cache some of the composer dependencies so they install quicker during first run
+RUN wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.json \
+        && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.lock \
+        && cd /tmp \
+        && COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-autoloader --no-scripts \
+        && COMPOSER_MEMORY_LIMIT=-1 composer update --prefer-dist --no-autoloader --no-scripts \
+        && cd / \
+        && rm -rf /tmp/*
 
 # Add the init scripts
 COPY init.sh /init.sh

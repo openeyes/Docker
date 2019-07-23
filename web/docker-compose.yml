@@ -1,6 +1,6 @@
 version: '3.4'
 
-## PLEASE provide values for relevant environment variables (e.g, GIT_USER) in an accompanyiong .env file
+## PLEASE provide values for relevant environment variables (e.g, GIT_USER) in an accompanying .env file
 ## the .env file will not be checked in to version control
 
 services:

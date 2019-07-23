@@ -65,10 +65,10 @@ do
 done
 
 # If SSH server is enabled, start it early in the process so that it is accessible for debugging
-[ "$SSH_SERVER_ENABLE" == "TRUE" ] && service ssh start
+[ "${SSH_SERVER_ENABLE^^}" == "TRUE" ] && service ssh start
 
 # if we have mysql installed in the same image, then start the service
-[ "$LOCAL_DB" == "TRUE" ] && service mysql start
+[ "${LOCAL_DB^^}" == "TRUE" ] && service mysql start
 
 # Use docker secret as DB password, or fall back to environment variable
 [ -f /run/secrets/DATABASE_PASS ] && dbpassword="$(</run/secrets/DATABASE_PASS)" || dbpassword=${DATABASE_PASS:-""}
@@ -101,6 +101,10 @@ db_pre_exist=$( ! mysql -A --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USE
 
 newinstall=0
 
+cloneswitches=""
+# If we are in test mode, only do a shallow clone
+[ "${OE_MODE^^}" = "TEST" ] && cloneswitches="--single-branch --depth 1 $cloneswitches"
+
 # If no web files exist, check them out locally
 if [ ! -f $WROOT/protected/config/core/common.php ]; then
   ssh git@github.com -T
@@ -109,8 +113,8 @@ if [ ! -f $WROOT/protected/config/core/common.php ]; then
   [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://github.com/" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
 
   # If openeyes files don't already exist then clone them
-  echo cloning "-b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git"
-  git clone -b ${BUILD_BRANCH} $cloneroot${gitroot}/openeyes.git $WROOT
+  echo cloning "$cloneswitches $cloneroot${gitroot}/openeyes.git"
+  git clone -b ${BUILD_BRANCH} $cloneswitches $cloneroot${gitroot}/openeyes.git $WROOT
 
   newinstall=1
 fi
@@ -118,19 +122,23 @@ fi
 # If this is a new container (using existing git files), then we need to initialise the config
 
 if [ ! -f /initialised.oe ]; then
-  initparams="$BUILD_BRANCH --accept --no-migrate --preserve-database --no-sample"
+  initparams="${BUILD_BRANCH} $cloneswitches --accept --no-migrate --preserve-database --no-sample"
   [[ $newinstall = 0 && -d "$WROOT/protected/modules/eyedraw/src" ]] && initparams="$initparams --no-checkout" || :
   echo "Initialising new container..."
   $WROOT/protected/scripts/install-oe.sh $initparams
-  echo "true" > /initialised.oe
-fi
 
-if [ "$db_pre_exist" != "1" ]; then
+  if [ "$db_pre_exist" != "1" ] || [ "${OE_FORCE_DB_RESET^^}" = "TRUE" ]; then
     #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
     echo "Database host=${DATABASE_HOST:-'localhost'}; user=${MYSQL_SUPER_USER:-'openeyes'}; name=${DATABASE_NAME:-'openeyes'} was not fount. Creating a new db"
-    [ "$USE_DEMO_DATA" = "TRUE" ] && resetparams="--demo" || resetparams=""
+    [ "${USE_DEMO_DATA^^}" = "TRUE" ] && resetparams="--demo" || resetparams=""
     $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH $resetparams
+  fi
+  
 fi
+
+# If the database pre-existed AND we are in test mode, then automatically run the latest migrations
+# Or also if OE_FORCE_MIGRATE=TRUE then force the migration
+[ "$db_pre_exist" = "1" ] && { [[ "${OE_MODE^^}" = "TEST" || "${OE_FORCE_MIGRATE^^}" = "TRUE" ]] && $WROOT/protected/scripts/oe-migrate.sh -q || : ; } || :
 
 [[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && { echo -e "\n\nDependencies not found, installing now...\n\n"; $WROOT/protected/scripts/oe-fix.sh; } || :
 
@@ -174,10 +182,12 @@ fi
 
 $WROOT/protected/scripts/set-profile.sh
 
-[[ "$OE_PORTAL_ENABLED" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *  root  . /env.sh; /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; chmod 0644 /etc/cron.d/portalexams; } | :
+[[ "${OE_PORTAL_ENABLED^^}" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *  root  . /env.sh; /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; chmod 0644 /etc/cron.d/portalexams; } | :
 
 # store environment to file - needed for cron jobs
 [ ! -f /env.sh ] && { env | sed -r "s/'/\\\'/gm" | sed -r "s/^([^=]+=)(.*)\$/export \1'\2'/gm" > /env.sh; chmod a+x /env.sh; } || :
+
+[ ! -f /initialised.oe ] && echo "true" > /initialised.oe || :
 
 # start cron (needed for hotlist updates + other tasks depending on configuration)
 service cron start

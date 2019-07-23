@@ -1,0 +1,41 @@
+version: '3.4'
+
+## PLEASE provide values for relevant environment variables (e.g, GIT_USER) in an accompanying .env file
+## the .env file will not be checked in to version control
+
+services:
+  ci:
+    image: appertaopeneyes/web-allin1:php7
+    environment:
+      GIT_USER: ${GIT_USER:?'Please set your github user id in .env file'}
+      TZ: 'Europe/London'
+      UID: '1'
+      GID: '1'
+      OE_MODE: 'TEST'
+      OE_INSTITUTION_CODE: NEW
+      OE_PORTAL_URI: ${OE_PORTAL_URI}
+      OE_PORTAL_EXTERNAL_URI: ${OE_PORTAL_EXTERNAL_URI}
+      OE_PORTAL_USERNAME: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
+      OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
+      WAIT_HOSTS_TIMEOUT: "300"
+      BUILD_BRANCH: master 
+      #ci-speed-tweaks
+      #WAIT_HOSTS: "host.docker.internal:80"
+    secrets:
+      - source: SSH_PRIVATE_KEY
+      - source: SSH_AUTHORIZED_KEYS
+    ports:
+      - "8080:80"
+      - "2222:22"
+    stdin_open: true
+    tty: true
+    volumes: 
+      - ..\web\init.sh:/init.sh
+
+secrets:
+  SSH_PRIVATE_KEY:
+    file: ~/.ssh/id_rsa
+  SSH_AUTHORIZED_KEYS:
+    file: ~/.ssh/id_rsa.pub

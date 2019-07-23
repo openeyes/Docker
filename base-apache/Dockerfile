@@ -73,17 +73,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     php${PHP_VERSION}-zip \
     ruby-compass \
   && [ $(echo "${PHP_VERSION} < 7.2" | bc -l) = 1 ] && apt-get install -y --no-install-recommends php${PHP_VERSION}-mcrypt || : \
-  && npm install -g npm \
-  && npm install -g grunt-cli \
+  && npm install -q -g npm \
   && a2enmod rewrite \
   && apt-get autoremove -y \
   && apt-get clean -y \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -rf /tmp/*
 
 # Install wkhtmltopdf
 RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.${OS_VERSION}_amd64.deb \
     && dpkg -i --force-depends /wkhtml.deb \
-    && rm /wkhtml.deb
+    && rm /wkhtml.deb \
+    && rm -rf /tmp/*
 
 # SETUP apache config
 # Enable add custom PHP and apache settings (including timezone), plus configure SSH
@@ -105,7 +106,8 @@ RUN chmod 774 /set_php_vars.sh \
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php composer-setup.php \
   && php -r "unlink('composer-setup.php');" \
-  && mv composer.phar /usr/local/bin/composer
+  && mv composer.phar /usr/local/bin/composer \
+  && rm -rf /tmp/*
 
 # As mcrypt was retired in php7.2, we have to complie it from pecl
 # which SIGNIFICANTLY increases image size. 
