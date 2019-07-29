@@ -53,6 +53,8 @@ services:
     tty: true
     volumes:
       - "oe-web:/var/www/openeyes"
+      # Following is useful when using VS COde remote for development
+      - "php7_vscode:/root/.vscode-server"
     depends_on: 
      - "db"
      - "web_5"
@@ -92,6 +94,8 @@ services:
     tty: true
     volumes:
       - "oe-web:/var/www/openeyes"
+      # Following is useful when using VS COde remote for development
+      - "php5_vscode:/root/.vscode-server"
     depends_on: 
       - db
     hostname: oe-web-php5
@@ -99,6 +103,8 @@ services:
 volumes:
   oe-web:
   oe-db:
+  php5_vscode:
+  php7_vscode:
 
 secrets:
   SSH_PRIVATE_KEY:
