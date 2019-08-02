@@ -46,7 +46,7 @@ By default, this image will grab the latest openeyes files from the appertafound
 
 If you wish to use the latest development builds, you will need to:
 1. Be a member of the openeyes github organisation
-2. Provide your private SSH keys
+2. Provide your public SSH keys
 3. Provide your github username and email Address
 
 ### SSH key
