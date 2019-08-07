@@ -4,7 +4,7 @@ Docker configuration etc.
 Currently a minimum openeyes version of 3.1 is required to use this image. Tagged versions for older openeyes versions will be created in due course.
 
 # DISCLAIMER
-This project is not offically supported. It is currently maintained by @biskyt as a side project, for his own use. While every effort is made to cover a wide range of use cases, your milage may vary.
+Maintained by @biskyt, with no official support from the AppertaFoundation.
 
 **NO SUPPORT IS PROVIDED / IMPLIED**, and use is **AT YOUR OWN RISK**
 
