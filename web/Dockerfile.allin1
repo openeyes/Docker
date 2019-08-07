@@ -66,8 +66,18 @@ ENV WROOT="$BUILD_WROOT"
 # set up folders
 RUN cd / && mkdir -p $WROOT
 
-# ARG CACHEBUSTER=$RANDOM
-	# Use this to prevent build cache using an old version of source files
+RUN chgrp -R www-data $WROOT
+
+
+# install grunt-cli and pre-cache some of the composer dependencies so they install quicker during first run
+RUN     && npm install -q -g grunt-cli \
+        && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.json \
+        && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.lock \
+        && cd /tmp \
+        && COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-autoloader --no-scripts \
+        && COMPOSER_MEMORY_LIMIT=-1 composer update --prefer-dist --no-autoloader --no-scripts \
+        && cd / \
+        && rm -rf /tmp/*
 
 # If installing mysql into the image, setup mariadb and
 # bind to accept connections from remote servers
@@ -78,17 +88,6 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y --n
         && rm -rf /var/lib/apt/lists/* \ 
         && rm -rf /tmp/* ; } || : 
         
-
-RUN chgrp -R www-data $WROOT
-
-# pre-cache some of the composer dependencies so they install quicker during first run
-RUN wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.json \
-        && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.lock \
-        && cd /tmp \
-        && COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-autoloader --no-scripts \
-        && COMPOSER_MEMORY_LIMIT=-1 composer update --prefer-dist --no-autoloader --no-scripts \
-        && cd / \
-        && rm -rf /tmp/*
 
 # Add the init scripts
 COPY init.sh /init.sh
