@@ -72,7 +72,7 @@ RUN chgrp -R www-data $WROOT
 # install grunt-cli and pre-cache some of the composer dependencies so they install quicker during first run
 RUN     npm install -q -g grunt-cli \
         && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.json \
-        && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.lock \
+        && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.lock -O /tmp/composer.lock \
         && cd /tmp \
         && COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-autoloader --no-scripts \
         && COMPOSER_MEMORY_LIMIT=-1 composer update --prefer-dist --no-autoloader --no-scripts \

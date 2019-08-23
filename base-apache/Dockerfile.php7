@@ -27,6 +27,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     ghostscript \
     git-core \
     gnupg \
+    jq \
     libgamin0 \
     libjpeg62 \
     libreoffice-common \

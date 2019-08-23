@@ -179,7 +179,10 @@ if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
 
 fi
 
+# Set BEHAT default behat paramerters for BEHAT testing
+[ -z $BEHAT_PARAMS ] && export BEHAT_PARAMS="extensions[Behat\\MinkExtension\\Extension][base_url]=${SELENIUM_BASE_URL:-http://host.docker.internal}&extensions[Behat\\MinkExtension\\Extension][selenium2][wd_host]=${SELENIUM_WD_HOST:-http://host.docker.internal:4444/wd/hub}" || :
 
+# update profile shortcuts
 $WROOT/protected/scripts/set-profile.sh
 
 [[ "${OE_PORTAL_ENABLED^^}" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *  root  . /env.sh; /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; chmod 0644 /etc/cron.d/portalexams; } | :
@@ -214,10 +217,40 @@ tail -n0 /var/log/php_errors.log -F | awk '/^==> / {a=substr($0, 5, length-8); n
 
 # note - the ^^ converts to uppercase (,, can be used to convert to lowercase)
 if [ ${OE_MODE^^} = "TEST" ]; then 
-  echo "STARING TESTS..."
-  [ !-z ${PHPUNIT_CLI_SWITCHES} ] && echo "With extra switches: ${PHPUNIT_CLI_SWITCHES}"
-  $WROOT/protected/scripts/oe-unit-tests.sh ${PHPUNIT_CLI_SWITCHES}
-  exit $?
-else
-  apachectl -DFOREGROUND
+  #[ ! -z "$TESTS_TO_RUN" ] && { declare -a tests=( $TESTS_TO_RUN ); echo "Will auto-run the following test(s): ${a[@]}"; } || echo "Tests will not run automatically. To auto-start tests, set the TESTS_TO_RUN env variable (space separated list)"
+  [ ! -z "$TESTS_TO_RUN" ] && { IFS=';' read -ra tests <<< "$TESTS_TO_RUN"; echo "Will auto-run the following test(s): ${tests[@]}"; } || echo "Tests will not run automatically. To auto-start tests, set the TESTS_TO_RUN env variable (space separated list)"
+
+  # If tests are specified, run them automatically. Else, continue as normal
+  if [ "${#tests[@]}" -gt 0 ]; then 
+    echo "STARING TESTS..."
+  
+    result=0
+
+    for i in "${!tests[@]}"
+    do
+        if [ "${tests[i]^^}" = "PHPUNIT" ]; then
+          echo "*** RUNNING PHPUNIT ***" 
+          [ ! -z ${PHPUNIT_CLI_SWITCHES} ] && echo " With extra switches: ${PHPUNIT_CLI_SWITCHES}"
+          $WROOT/protected/scripts/oe-unit-tests.sh ${PHPUNIT_CLI_SWITCHES}
+        elif [ "${tests[i]^^}" = "BEHAT" ]; then
+          echo "*** RUNNING BEHAT ***" 
+          service apache2 start
+          $WROOT/protected/scripts/oe-behat-tests.sh${BEHAT_CONFIG_PATH:+ --config $BEHAT_CONFIG_PATH}${BEHAT_CLI_SWITCHES:+ $BEHAT_CLI_SWITCHES}${BEHAT_TEST_PATH:+ --test $BEHAT_TEST_PATH}
+          service apache2 stop 2>/dev/null
+        fi
+
+        # If any test fails then the final result will = the first error code
+        [ ! $result -gt 0 ] && result=$? || :
+
+        echo "Length of array = ${#tests[@]} -- current loop = $i -- i+1 = $((i + 1))"
+        # if this is not the last test, then restet the database
+      [ $((i + 1)) -lt ${#tests[@]} ] && { echo -e "\n\n\n ********** RESETTING DATABASE **********\n\n\n"; $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH; } || :
+      
+    done
+
+    exit $result
+  fi
 fi
+
+apachectl -DFOREGROUND
+
