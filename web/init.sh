@@ -217,7 +217,7 @@ tail -n0 /var/log/php_errors.log -F | awk '/^==> / {a=substr($0, 5, length-8); n
 
 # note - the ^^ converts to uppercase (,, can be used to convert to lowercase)
 if [ ${OE_MODE^^} = "TEST" ]; then 
-  #[ ! -z "$TESTS_TO_RUN" ] && { declare -a tests=( $TESTS_TO_RUN ); echo "Will auto-run the following test(s): ${a[@]}"; } || echo "Tests will not run automatically. To auto-start tests, set the TESTS_TO_RUN env variable (space separated list)"
+  ## TESTS_TO_RUN is a semi-colon separated list of tests
   [ ! -z "$TESTS_TO_RUN" ] && { IFS=';' read -ra tests <<< "$TESTS_TO_RUN"; echo "Will auto-run the following test(s): ${tests[@]}"; } || echo "Tests will not run automatically. To auto-start tests, set the TESTS_TO_RUN env variable (space separated list)"
 
   # If tests are specified, run them automatically. Else, continue as normal
@@ -228,27 +228,33 @@ if [ ${OE_MODE^^} = "TEST" ]; then
 
     for i in "${!tests[@]}"
     do
+      lastresult=-1
+
         if [ "${tests[i]^^}" = "PHPUNIT" ]; then
           echo "*** RUNNING PHPUNIT ***" 
           [ ! -z ${PHPUNIT_CLI_SWITCHES} ] && echo " With extra switches: ${PHPUNIT_CLI_SWITCHES}"
           $WROOT/protected/scripts/oe-unit-tests.sh ${PHPUNIT_CLI_SWITCHES}
+          lastresult=$?
         elif [ "${tests[i]^^}" = "BEHAT" ]; then
           echo "*** RUNNING BEHAT ***" 
           service apache2 start
           $WROOT/protected/scripts/oe-behat-tests.sh${BEHAT_CONFIG_PATH:+ --config $BEHAT_CONFIG_PATH}${BEHAT_CLI_SWITCHES:+ $BEHAT_CLI_SWITCHES}${BEHAT_TEST_PATH:+ --test $BEHAT_TEST_PATH}
+          lastresult=$?
           service apache2 stop 2>/dev/null
+        else
+          echo "*** ERROR: Test '${tests[i]^^}' from TESTS_TO_RUN was not recognised. Skipping. ****"
         fi
 
+        echo Test Result = $lastresult
         # If any test fails then the final result will = the first error code
-        [ ! $result -gt 0 ] && result=$? || :
+        [ $lastresult -gt 0 ] && result=$lastresult || :
 
-        echo "Length of array = ${#tests[@]} -- current loop = $i -- i+1 = $((i + 1))"
         # if this is not the last test, then restet the database
       [ $((i + 1)) -lt ${#tests[@]} ] && { echo -e "\n\n\n ********** RESETTING DATABASE **********\n\n\n"; $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH; } || :
       
     done
-
-    exit $result
+    echo Final result of all tests = $result
+    exit $result;
   fi
 fi
 

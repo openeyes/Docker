@@ -5,87 +5,38 @@ version: '3.4'
 
 services:
   ci:
-    # image: appertaopeneyes/web-allin1:php7
+    # image: appertaopeneyes/ci
     build: 
       context: ./
     environment:
-      GIT_USER: ${GIT_USER:?'Please set your github user id in .env file'}
-      TZ: 'Europe/London'
-      UID: '1'
-      GID: '1'
-      # OE_MODE: 'TEST'
-      # OE_MODE: DEV
-      OE_INSTITUTION_CODE: ${OE_INSTITUTION_CODE:-NEW}
-      OE_PORTAL_URI: ${OE_PORTAL_URI}
-      OE_PORTAL_EXTERNAL_URI: ${OE_PORTAL_EXTERNAL_URI}
-      OE_PORTAL_USERNAME: ${OE_PORTAL_USERNAME}
-      OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
-      OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
-      OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
-      WAIT_HOSTS_TIMEOUT: "300"
+      WAIT_HOSTS_TIMEOUT: "900"
       SELENIUM_BASE_URL: "http://ci"
       SELENIUM_WD_HOST: http://selenium:4444/wd/hub
       TESTS_TO_RUN: "BEHAT"
-      BUILD_BRANCH: docker/behat 
+      # BUILD_BRANCH: docker/behat 
     secrets:
       - source: SSH_PRIVATE_KEY
-      - source: SSH_AUTHORIZED_KEYS
     ports:
       - "8080:80"
       - "2222:22"
     stdin_open: true
     tty: true
-    volumes: 
-      - ..\web\init.sh:/init.sh
-      - test_web:/var/www/openeyes
-      # TODO: REMOVE THIS VOLUME WHEN DONE TESTING
-
+    depends_on: 
+      - selenium
+    volumes:
+      - ../web/init.sh:/init.sh
+    
   selenium:
     image: selenium/standalone-chrome-debug:3.14
     container_name: selenium
     ports:
       - "4444:4444"
       - "5900:5900"
-      - "9515:9515"
     environment:
       - VNC_NO_PASSWORD=1
     volumes:
       - /dev/shm:/dev/shm
-    # environment:
-    #   - START_XVFB=false
-  # selenium-hub:
-  #   image: selenium/hub:3.141.59-titanium
-  #   container_name: selenium-hub
-  #   ports:
-  #     - "4444:4444"
-  #   # environment:
-  #   #   - START_XVFB=false
-  # chrome:
-  #   image: selenium/node-chrome:3.141.59-titanium
-  #   volumes:
-  #     - /dev/shm:/dev/shm
-  #   depends_on:
-  #     - selenium-hub
-  #   environment:
-  #     - HUB_HOST=selenium-hub
-  #     - HUB_PORT=4444
-  #     # - START_XVFB=false
-  # firefox:
-  #   image: selenium/node-firefox:3.141.59-titanium
-  #   volumes:
-  #     - /dev/shm:/dev/shm
-  #   depends_on:
-  #     - selenium-hub
-  #   environment:
-  #     - HUB_HOST=selenium-hub
-  #     - HUB_PORT=4444
-  #     # - START_XVFB=false
-
-volumes:
-  test_web:
 
 secrets:
   SSH_PRIVATE_KEY:
     file: ~/.ssh/id_rsa
-  SSH_AUTHORIZED_KEYS:
-    file: ~/.ssh/id_rsa.pub
