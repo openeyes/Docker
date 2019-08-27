@@ -250,7 +250,7 @@ if [ ${OE_MODE^^} = "TEST" ]; then
         [ $lastresult -gt 0 ] && result=$lastresult || :
 
         # if this is not the last test, then restet the database
-      [ $((i + 1)) -lt ${#tests[@]} ] && { echo -e "\n\n\n ********** RESETTING DATABASE **********\n\n\n"; $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH; } || :
+      [[ $((i + 1)) -lt ${#tests[@]} && -z $NO_RESET_DB_BETWEEN_TESTS ]] && { echo -e "\n\n\n ********** RESETTING DATABASE **********\n\n\n"; $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH; } || :
       
     done
     echo Final result of all tests = $result

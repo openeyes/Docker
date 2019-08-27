@@ -9,11 +9,13 @@ services:
     build: 
       context: ./
     environment:
-      WAIT_HOSTS_TIMEOUT: "900"
       SELENIUM_BASE_URL: "http://ci"
       SELENIUM_WD_HOST: http://selenium:4444/wd/hub
-      TESTS_TO_RUN: "BEHAT"
-      # BUILD_BRANCH: docker/behat 
+      TESTS_TO_RUN: "PHPUNIT;BLAHH;BEHAT"
+      # TESTS_TO_RUN: ""
+      NO_RESET_DB_BETWEEN_TESTS: "true"
+      BUILD_BRANCH: docker/behat 
+      PHPUNIT_CLI_SWITCHES: "/var/www/openeyes/protected/tests/unit/controllers/BaseControllerTest.php"
     secrets:
       - source: SSH_PRIVATE_KEY
     ports:
@@ -21,7 +23,7 @@ services:
       - "2222:22"
     stdin_open: true
     tty: true
-    depends_on: 
+    depends_on:
       - selenium
     volumes:
       - ../web/init.sh:/init.sh
@@ -32,8 +34,11 @@ services:
     ports:
       - "4444:4444"
       - "5900:5900"
+      - "9515:9515"
     environment:
-      - VNC_NO_PASSWORD=1
+      VNC_NO_PASSWOR: "1"
+      SCREEN_WIDTH: "1920"
+      SCREEN_HEIGHT: "1080"
     volumes:
       - /dev/shm:/dev/shm
 
