@@ -218,7 +218,7 @@ tail -n0 /var/log/php_errors.log -F | awk '/^==> / {a=substr($0, 5, length-8); n
 # note - the ^^ converts to uppercase (,, can be used to convert to lowercase)
 if [ ${OE_MODE^^} = "TEST" ]; then 
   ## TESTS_TO_RUN is a semi-colon separated list of tests
-  [ ! -z "$TESTS_TO_RUN" ] && { IFS=';' read -ra tests <<< "$TESTS_TO_RUN"; echo "Will auto-run the following test(s): ${tests[@]}"; } || echo "Tests will not run automatically. To auto-start tests, set the TESTS_TO_RUN env variable (space separated list)"
+  [ ! -z "$TESTS_TO_RUN" ] && { IFS=';' read -ra tests <<< "$TESTS_TO_RUN"; echo "Will auto-run the following test(s): ${tests[*]}"; } || echo "Tests will not run automatically. To auto-start tests, set the TESTS_TO_RUN env variable (space separated list)"
 
   # If tests are specified, run them automatically. Else, continue as normal
   if [ "${#tests[@]}" -gt 0 ]; then 

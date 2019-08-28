@@ -89,12 +89,12 @@ envtype=DOCKER
 
 [ ! -f $WROOT/protected/config/local/common.php ] && cp $WROOT/protected/config/local.sample $WROOT/protected/config/local || : 
 
-resetswitches="--no-migrate --no-fix --banner '$BUILD_BRANCH'"
+resetswitches=("--no-migrate" "--no-fix" "--banner" "$BUILD_BRANCH")
 
-[ $genetics = 1 ] && resetswitches="$resetswitches --genetics-enable" || :
-[ "$USE_DEMO_DATA" = "TRUE" ] && resetswitches="$resetswitches --demo" || :
+[ $genetics = 1 ] && resetswitches+=("--genetics-enable") || :
+[ "$USE_DEMO_DATA" = "TRUE" ] && resetswitches+=("--demo") || :
 
-oe-reset $resetswitches
+oe-reset ${resetswitches[@]}
 
 # call oe-fix - this includes migrations
 oe-fix

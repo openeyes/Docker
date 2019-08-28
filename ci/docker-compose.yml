@@ -6,7 +6,7 @@ version: '3.4'
 services:
   ci:
     # image: appertaopeneyes/ci
-    build: 
+    build:
       context: ./
     environment:
       SELENIUM_BASE_URL: "http://ci"
@@ -14,7 +14,7 @@ services:
       TESTS_TO_RUN: "PHPUNIT;BLAHH;BEHAT"
       # TESTS_TO_RUN: ""
       NO_RESET_DB_BETWEEN_TESTS: "true"
-      BUILD_BRANCH: docker/behat 
+      BUILD_BRANCH: docker/behat
       PHPUNIT_CLI_SWITCHES: "/var/www/openeyes/protected/tests/unit/controllers/BaseControllerTest.php"
     secrets:
       - source: SSH_PRIVATE_KEY
@@ -27,7 +27,7 @@ services:
       - selenium
     volumes:
       - ../web/init.sh:/init.sh
-    
+
   selenium:
     image: selenium/standalone-chrome-debug:3.14
     container_name: selenium
