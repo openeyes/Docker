@@ -36,7 +36,7 @@ RUN git clone --single-branch --branch master --depth 1 https://github.com/apper
         && unzip /sample/sql/sample_db.zip -d /sample \
         && service mysql start \
         && export dbresetsql="drop database if exists openeyes; create database ${DATABASE_NAME:-openeyes}; grant all privileges on ${DATABASE_NAME:-openeyes}.* to '${DATABASE_USER:-openeyes}'@'%' identified by '${DATABASE_PASS:-openeyes}'; flush privileges;" \
-        && [ -n ${MYSQL_ROOT_PASSWORD} ] && export dbpw="-p${MYSQL_ROOT_PASSWORD}" || export dbpw="" \
+        && [ -n "${MYSQL_ROOT_PASSWORD}" ] && export dbpw="-p${MYSQL_ROOT_PASSWORD}" || export dbpw="" \
         && echo "" \
         && eval "echo ***RUNNING COMMAND*** $dbpw -e \"${dbresetsql}\"" \
         && eval "mysql $dbpw -e \"${dbresetsql}\"" \
