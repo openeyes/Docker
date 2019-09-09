@@ -32,6 +32,9 @@ grep -q "$TZ" /etc/timezone >/dev/null
 grep -q "$TZ" /etc/php/${PHP_VERSION}/apache2/conf.d/99-timezone.ini >/dev/null
 [ $? = 1 ] && { echo "date.timezone = ${TZ:-'Europe/London'}" > /etc/php/${PHP_VERSION}/apache2/conf.d/99-timezone.ini && echo "Updated 99-timezone.ini"; } | :
 
+echo system date = $(date)
+echo php date = $(php -r 'echo date("l M d H:i:s y") . " " .  ini_get("date.timezone") . "\n";')
+
 # set any new PHP ini settings from PHPI_* environment variables
 /set_php_vars.sh
 
