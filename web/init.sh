@@ -163,7 +163,18 @@ if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
 
 fi
 
-# Set BEHAT default behat paramerters for BEHAT testing
+if [ ! -z "${RESET_DB_CRON}" ]; then
+  echo ""
+  echo "*****************************************************************************"
+  echo "** -= This container automatically resets the database on the following =- **"
+  echo "** -=               cron schedule: ${RESET_DB_CRON}                 =- **"
+  echo "*****************************************************************************"
+
+  [ ! -f /etc/cron.d/reset_db ] && echo -e "# /etc/cron.d/reset_db: Reset openeyes database on regular schedule\n${RESET_DB_CRON}   root . /env.sh; /var/www/openeyes/protected/scripts/oe-reset.sh --demo >/dev/null 2>&1" > /etc/cron.d/reset_db | :
+
+fi
+
+# Set BEHAT default behat paramerters for BEHAT testing (valid for BEHAT 2.5--. For BEHAT 3.0+ this needs to be changed to JSON)
 [ -z $BEHAT_PARAMS ] && export BEHAT_PARAMS="extensions[Behat\\MinkExtension\\Extension][base_url]=${SELENIUM_BASE_URL:-http://host.docker.internal}&extensions[Behat\\MinkExtension\\Extension][selenium2][wd_host]=${SELENIUM_WD_HOST:-http://host.docker.internal:4444/wd/hub}" || :
 
 # update profile shortcuts
