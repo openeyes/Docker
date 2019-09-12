@@ -101,7 +101,7 @@ RUN chmod 774 /set_php_vars.sh \
   && chown www-data /var/log/php \
   && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
   && a2enmod rewrite \
-  && echo "AuthorizedKeysFile   /.authorized_keys .ssh/authorized_keys %h/.ssh/authorized_keys" >> /etc/ssh/sshd_config
+  && echo "AuthorizedKeysFile  /run/.ssh/authorized_keys /.authorized_keys .ssh/authorized_keys %h/.ssh/authorized_keys" >> /etc/ssh/sshd_config
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \

@@ -38,34 +38,15 @@ echo php date = $(php -r 'echo date("l M d H:i:s y") . " " .  ini_get("date.time
 # set any new PHP ini settings from PHPI_* environment variables
 /set_php_vars.sh
 
-# Set ssh key Can be done using a secret (SSH_PRIVATE_KEY), as an ENV variable (SSH_PRIVATE_KEY)
-# Or by mounting your host .ssh folder to /root/.host-ssh
+# Set ssh key can be done using a secret (SSH_PRIVATE_KEY)or as an ENV variable (SSH_PRIVATE_KEY)
 # All efforts are made to avoid updating a file if it already exists - to minimise FS layers
-mkdir -p /root/.ssh /tmp/.ssh
-idfilecontent="Host github.com\nStrictHostKeyChecking no"
-[ -d /tmp/.host-ssh ] && rsync -av --no-perms --no-owner --no-group /tmp/.host-ssh/ /root/.ssh --exclude known_hosts --delete 2>/dev/null || :
-[ ! -z ${SSH_PRIVATE_KEY} ] && { echo "${SSH_PRIVATE_KEY}" > /tmp/.ssh/id_rsa && echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config; } || :
-[[ -f /run/secrets/SSH_PRIVATE_KEY && ! -f /tmp/.ssh/id_rsa ]] && { echo "USING DOCKER SECRET FOR SSH"; cp /run/secrets/SSH_PRIVATE_KEY /tmp/.ssh/id_rsa; echo -e "$idfilecontent\nIdentityFile /tmp/.ssh/id_rsa" > /root/.ssh/config ; } || :
-if ! grep -Fxq "StrictHostKeyChecking no" /root/.ssh/config 2>/dev/null; then echo -e "\n$idfilecontent\n" >> /root/.ssh/config; fi
-
+mkdir -p /root/.ssh /run/.ssh
+[[ ! -z ${SSH_PRIVATE_KEY} && ! -f /run/.ssh/id_rsa ]] && { echo "USING ENVIRONMENT VARIABLE FOR SSH"; echo "${SSH_PRIVATE_KEY}" > /run/.ssh/id_rsa && chmod 600 /run/.ssh/id_rsa; } || :
+[[ -f /run/secrets/SSH_PRIVATE_KEY && ! -f /run/.ssh/id_rsa ]] && { echo "USING DOCKER SECRET FOR SSH"; cp /run/secrets/SSH_PRIVATE_KEY /run/.ssh/id_rsa && chmod 600 /run/.ssh/id_rsa; } || :
+[[ ! -f /root/.ssh/config && -f /run/.ssh/id_rsa ]] && { echo -e "IdentityFile /run/.ssh/id_rsa\nHost github.com\nStrictHostKeyChecking no" > /root/.ssh/config && chmod 644 /root/.ssh/config; } || :
 # Set up authorised keys for SSH server (if provided)
-[[ ! -z "$SSH_AUTHORIZED_KEYS" && ! -f ~/.ssh/authorized_keys ]] && echo "${SSH_AUTHORIZED_KEYS}" > ~/.ssh/authorized_keys || :
-[[ -f /run/secrets/SSH_AUTHORIZED_KEYS && ! -f ~/.ssh/authorized_keys ]] && { echo "ADDING SSH AUTHORISED KEYS"; cp /run/secrets//SSH_AUTHORIZED_KEYS ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys ; } || :
-
-# Update file permissions to 600 for SSH files if not already correct
-# Checks current permissions firs, to avoid creating unecessary extra filesystem layers
-folders600=( /root/.ssh /tmp/.ssh )
-for i in "${folders600[@]}"
-do
-  shopt -s nullglob
-  for f in $(ls "$i" | sort -V)
-  do
-      if [[ $(stat -c %a "$i"/"$f") != *"600" ]]; then
-        chmod 600 "$i"/"$f"
-        echo updated permissions for "$i"/"$f"
-      fi
-  done
-done
+[[ ! -z "$SSH_AUTHORIZED_KEYS" && ! -f /run/.ssh/authorized_keys ]] && { echo "ADDING SSH AUTHORISED KEYS from ENV"; echo "${SSH_AUTHORIZED_KEYS}" > /run/.ssh/authorized_keys; chmod 644 /run/.ssh/authorized_keys ; } || :
+[[ -f /run/secrets/SSH_AUTHORIZED_KEYS && ! -f /run/.ssh/authorized_keys ]] && { echo "ADDING SSH AUTHORISED KEYS FROM SECRET"; cp /run/secrets/SSH_AUTHORIZED_KEYS /run/.ssh/authorized_keys; chmod 644 /run/.ssh/authorized_keys ; } || :
 
 # If SSH server is enabled, start it early in the process so that it is accessible for debugging
 [ "${SSH_SERVER_ENABLE^^}" == "TRUE" ] && service ssh start

@@ -1,8 +1,8 @@
 ## Builds a base image with OS application dependencies ready installed
 ## For use with OpenEyes.
 
-ARG OS_VERSION="xenial"
-ARG BUILD_PHP_VERSION="5.6"
+ARG OS_VERSION=bionic
+ARG BUILD_PHP_VERSION="7.2"
 
 FROM ubuntu:$OS_VERSION
 
@@ -27,6 +27,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     ghostscript \
     git-core \
     gnupg \
+    jq \
     libgamin0 \
     libjpeg62 \
     libreoffice-common \
@@ -117,4 +118,3 @@ COPY mcrypt-pecl-install.sh mcrypt-pecl-install.sh
 ## run /mcrypt-pecl-install.sh manually if mcrypt is needed for testing (or uncomment the previous RUN line in the dockerfile and rebuild)
 
 EXPOSE 80 3306 22
-
