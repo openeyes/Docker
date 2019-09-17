@@ -84,7 +84,7 @@
                         "value": "0 * * * *"
                     }
                 ],
-                "description": "If you want the database to be reset regaularly, then select a value here. Else leave an No. *CAUTION:* Selecting a value here will cause all data to be wiped and reset back to a clean demo DB"
+                "description": "If you want the database to be reset regaularly, then select a value here. Else leave as No. *CAUTION:* Selecting a value here will cause all data to be wiped and reset back to a clean demo DB"
             },
             {
                 "label": "Time Zone",
@@ -123,7 +123,7 @@
     {
         "type": 1,
         "title": "Openeyes - Advanced",
-        "description": "OpenEyes™ is an Electronic Medical Record (EMR) application for ophthalmology, provided under an A-GPL v3 license.",
+        "description": "OpenEyes™ is an Electronic Medical Record (EMR) application for ophthalmology, provided under an A-GPL v3 license. This template includes a lot of extra options that can be set. Such as enabling the optom portal, etc.",
         "categories": [
             "docker"
         ],
@@ -215,7 +215,7 @@
                         "value": "0 * * * *"
                     }
                 ],
-                "description": "If you want the database to be reset regaularly, then select a value here. Else leave an No. *CAUTION:* Selecting a value here will cause all data to be wiped and reset back to a clean demo DB"
+                "description": "If you want the database to be reset regaularly, then select a value here. Else leave as No. *CAUTION:* Selecting a value here will cause all data to be wiped and reset back to a clean demo DB"
             },
             {
                 "label": "Enable Optom Portal",

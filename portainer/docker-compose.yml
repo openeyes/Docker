@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:1.7
     container_name: traefik
     domainname: ${DOMAINNAME:?}
     restart: always
@@ -32,6 +32,7 @@ services:
       - "traefik.frontend.headers.STSPreload=true"
       - "traefik.frontend.headers.frameDeny=true"
       - "traefik.frontend.auth.basic.usersFile=/shared/.htpasswd"
+      - "com.centurylinklabs.watchtower.enable=false"
     command:
       - "--api"
       - "--api.entrypoint=traefik"
