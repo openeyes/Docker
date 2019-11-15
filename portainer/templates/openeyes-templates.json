@@ -470,7 +470,7 @@
         ],
         "platform": "linux",
         "logo": "https://s3-eu-west-1.amazonaws.com/elasticbeanstalk-eu-west-1-327595770551/OpenEyes_logo.png",
-        "image": "appertaopeneyes/web-allin1:latest",
+        "image": "appertaopeneyes/web-allin1:php7",
         "network": "traefik_proxy",
         "name": "Please add container name here",
         "env": [
