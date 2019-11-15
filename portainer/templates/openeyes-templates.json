@@ -339,5 +339,346 @@
                 "bind": "/home/ubuntu/toby/authorized_keys"
             }
         ]
+    },
+    {
+        "type": 1,
+        "title": "Openeyes - PHP7",
+        "description": "OpenEyes™ is an Electronic Medical Record (EMR) application for ophthalmology, provided under an A-GPL v3 license.",
+        "categories": [
+            "docker"
+        ],
+        "platform": "linux",
+        "logo": "https://s3-eu-west-1.amazonaws.com/elasticbeanstalk-eu-west-1-327595770551/OpenEyes_logo.png",
+        "image": "appertaopeneyes/web-allin1:php7",
+        "network": "traefik_proxy",
+        "name": "Please add container name here",
+        "env": [
+            {
+                "label": "Github Branch",
+                "name": "BUILD_BRANCH",
+                "default": "master",
+                "description": "If you want to deploy a specific git branch (e.g, develop, feature/OE-XXXX, etc)"
+            },
+            {
+                "label": "Openeyes Mode",
+                "name": "OE_MODE",
+                "default": "LIVE",
+                "select": [
+                    {
+                        "text": "LIVE",
+                        "value": "LIVE",
+                        "default": true
+                    },
+                    {
+                        "text": "DEVELOPMENT",
+                        "value": "DEV"
+                    }
+                ],
+                "description": "LIVE mode will hide detailed error messages from the user, not install some development components and and set a few other security hardening options"
+            },
+            {
+                "label": "Local Database",
+                "name": "LOCAL_DB",
+                "default": "TRUE",
+                "preset": true
+            },
+            {
+                "label": "Track Commits",
+                "name": "TRACK_NEW_GIT_COMMITS",
+                "default": "FALSE",
+                "select": [
+                    {
+                        "text": "Yes",
+                        "value": "TRUE",
+                        "default": true
+                    },
+                    {
+                        "text": "No",
+                        "value": "FALSE"
+                    }
+                ],
+                "description": "If Yes, will automatically update to the latest code from 'Github branch' every 30 minutes"
+            },
+            {
+                "label": "Use Demo Data",
+                "name": "USE_DEMO_DATA",
+                "default": "TRUE",
+                "preset": true,
+                "description": "If true, will setup some demo patients in the worklist, add some document events, etc (runs all scripts in sample/demo)"
+            },
+            {
+                "label": "Reset Database on schedule?",
+                "name": "RESET_DB_CRON",
+                "default": "No",
+                "select": [
+                    {
+                        "text": "No",
+                        "value": "",
+                        "default": true
+                    },
+                    {
+                        "text": "Nightly",
+                        "value": "0 0 * * *"
+                    },
+                    {
+                        "text": "Hourly",
+                        "value": "0 * * * *"
+                    }
+                ],
+                "description": "If you want the database to be reset regaularly, then select a value here. Else leave as No. *CAUTION:* Selecting a value here will cause all data to be wiped and reset back to a clean demo DB"
+            },
+            {
+                "label": "Time Zone",
+                "name": "TZ",
+                "default": "Europe/London",
+                "description": "Override the time zone (for international users) - uses standard Unix timezone identifiers"
+            }
+        ],
+        "labels": [
+            {
+                "name": "traefik.enable",
+                "value": "true"
+            },
+            {
+              "name": "traefik.port",
+              "value": "80"
+            }
+        ],
+        "ports": [
+            "80/tcp",
+            "3306/tcp"
+        ],
+        "volumes": [
+            {
+                "container": "/run/secrets/SSH_PRIVATE_KEY",
+                "bind": "/home/ubuntu/.ssh/id_rsa"
+            },
+            {
+                "container": "/var/lib/mysql"
+            },
+            {
+                "container": "/var/www/openeyes"
+            }
+        ]
+    },
+    {
+        "type": 1,
+        "title": "Openeyes - PHP7 - Advanced",
+        "description": "OpenEyes™ is an Electronic Medical Record (EMR) application for ophthalmology, provided under an A-GPL v3 license. This template includes a lot of extra options that can be set. Such as enabling the optom portal, etc.",
+        "categories": [
+            "docker"
+        ],
+        "platform": "linux",
+        "logo": "https://s3-eu-west-1.amazonaws.com/elasticbeanstalk-eu-west-1-327595770551/OpenEyes_logo.png",
+        "image": "appertaopeneyes/web-allin1:latest",
+        "network": "traefik_proxy",
+        "name": "Please add container name here",
+        "env": [
+            {
+                "label": "Github Branch",
+                "name": "BUILD_BRANCH",
+                "default": "master",
+                "description": "If you want to deploy a specific git branch (e.g, develop, feature/OE-XXXX, etc)"
+            },
+            {
+                "label": "Openeyes Mode",
+                "name": "OE_MODE",
+                "default": "DEV",
+                "select": [
+                    {
+                        "text": "LIVE",
+                        "value": "LIVE"
+                    },
+                    {
+                        "text": "DEVELOPMENT",
+                        "value": "DEV",
+                        "default": true
+                    }
+                ],
+                "description": "LIVE mode will hide detailed error messages from the user, not install some development components and and set a few other security hardening options"
+            },
+            {
+                "label": "Local Database",
+                "name": "LOCAL_DB",
+                "default": "TRUE",
+                "preset": true
+            },
+            {
+                "label": "Track Commits",
+                "name": "TRACK_NEW_GIT_COMMITS",
+                "default": "FALSE",
+                "select": [
+                    {
+                        "text": "Yes",
+                        "value": "TRUE",
+                        "default": true
+                    },
+                    {
+                        "text": "No",
+                        "value": "FALSE"
+                    }
+                ],
+                "description": "If Yes, will automatically update to the latest code from 'Github branch' at regular intervals"
+            },
+            {
+                "label": "Use Demo Data",
+                "name": "USE_DEMO_DATA",
+                "default": "TRUE",
+                "select": [
+                    {
+                        "text": "Yes",
+                        "value": "TRUE",
+                        "default": true
+                    },
+                    {
+                        "text": "No",
+                        "value": "FALSE"
+                    }
+                ],
+                "description": "If Yes, will setup some demo patients in the worklist, add some document events, etc (runs all scripts in sample/demo)"
+            },
+            {
+                "label": "Reset Database on schedule?",
+                "name": "RESET_DB_CRON",
+                "default": "No",
+                "select": [
+                    {
+                        "text": "No",
+                        "value": "",
+                        "default": true
+                    },
+                    {
+                        "text": "Nightly",
+                        "value": "0 0 * * *"
+                    },
+                    {
+                        "text": "Hourly",
+                        "value": "0 * * * *"
+                    }
+                ],
+                "description": "If you want the database to be reset regaularly, then select a value here. Else leave as No. *CAUTION:* Selecting a value here will cause all data to be wiped and reset back to a clean demo DB"
+            },
+            {
+                "label": "Enable Optom Portal",
+                "name": "OE_PORTAL_ENABLED",
+                "default": "FALSE",
+                "select": [
+                    {
+                        "text": "Yes",
+                        "value": "TRUE"
+                    },
+                    {
+                        "text": "No",
+                        "value": "FALSE",
+                        "default": true
+                    }
+                ],
+                "description": "If Yes, will enable polling for data from the optom portal every 5 minutes. Note that you must also configure the Optom Potal user, password, urls, client id and client key for this to actually work"
+            },
+            {
+                "label": "Instituiton Code (optional)",
+                "name": "OE_INSTITUTION_CODE",
+                "default": "NEW",
+                "description": "The ODS institution code for the customer (e.g, RP6 = Moorfields) (optional - only really needed if Enable Optom Portal is 'Yes')"
+            },
+            {
+                "label": "Optom portal API URL (optional)",
+                "name": "OE_PORTAL_URI",
+                "default": "https://release-api.acrossopeneyes.com",
+                "description": "To use the optom portal, you must set the correct API endpoint uri (optional - only used if Enable Optom Portal is Yes)"
+            },
+            {
+                "label": "Optom portal External URL (optional)",
+                "name": "OE_PORTAL_EXTERNAL_URI",
+                "default": "https://release-gateway.acrossopeneyes.com",
+                "description": "This is the URL that will get printed in letters / onscreen instructions for the optom portal (optional - only used if Enable Optom Portal is Yes)"
+            },
+            {
+                "label": "Optom portal username (optional)",
+                "name": "OE_PORTAL_USERNAME",
+                "description": "Username for optom portal user (optional - only used if Enable Optom Portal is Yes)"
+            },
+            {
+                "label": "Optom portal password (optional)",
+                "name": "OE_PORTAL_PASSWORD",
+                "description": "Password for optom portal user (optional - only used if Enable Optom Portal is Yes)"
+            },
+            {
+                "label": "Optom portal client ID (optional)",
+                "name": "OE_PORTAL_CLIENT_ID",
+                "description": "API Client ID string for the optom portal (optional - only used if Enable Optom Portal is Yes)"
+            },
+            {
+                "label": "Optom portal client secret (optional)",
+                "name": "OE_PORTAL_CLIENT_SECRET",
+                "description": "API Client sectret for the optom portal (optional - only used if Enable Optom Portal is Yes)"
+            },
+            {
+                "label": "Docman Export directory (optional)",
+                "name": "OE_DOCMAN_EXPORT_DIRECTORY",
+                "default": "",
+                "description": "The directory that generated PDF files for Docman will be saved to. If left blank, Docman will be disabled (optional - only really needed if Enable Docmanis is Yes)"
+            },
+            {
+                "label": "Signature app URL (optional)",
+                "name": "OE_SIGNATURE_APP_URL",
+                "default": "https://dev.oesign.uk",
+                "description": "The url that users are directed to for capturing signatures -e.g., for eCVI (optional - only really needed if Enable Docman Yes)",
+                "preset": true
+            },
+            {
+                "label": "Time Zone",
+                "name": "TZ",
+                "default": "Europe/London",
+                "description": "Override the time zone (for international users) - uses standard Unix timezone identifiers"
+            },
+            {
+                "label": "Enable SSH Server?",
+                "name": "SSH_SERVER_ENABLE",
+                "default": "No",
+                "select": [
+                    {
+                        "text": "Yes",
+                        "value": "TRUE"
+                    },
+                    {
+                        "text": "No",
+                        "value": "FALSE",
+                        "default": true
+                    }
+                ],
+                "description": "If Yes, will enable an SSH server to run on port 22. Note that authorised keys should be added to /home/ubuntu/toby/authorized_keys on the host"
+            }
+        ],
+        "labels": [
+            {
+                "name": "traefik.enable",
+                "value": "true"
+            },
+            {
+              "name": "traefik.port",
+              "value": "80"
+            }
+        ],
+        "ports": [
+            "80/tcp",
+            "3306/tcp"
+        ],
+        "volumes": [
+            {
+                "container": "/run/secrets/SSH_PRIVATE_KEY",
+                "bind": "/home/ubuntu/.ssh/id_rsa"
+            },
+            {
+                "container": "/var/lib/mysql"
+            },
+            {
+                "container": "/var/www/openeyes"
+            },
+            {
+                "container": "/run/secrets/SSH_AUTHORIZED_KEYS",
+                "bind": "/home/ubuntu/toby/authorized_keys"
+            }
+        ]
     }
 ]
