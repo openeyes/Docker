@@ -109,8 +109,9 @@
         ],
         "volumes": [
             {
-                "container": "/run/secrets/SSH_PRIVATE_KEY",
-                "bind": "/home/ubuntu/.ssh/id_rsa"
+               "container": "/run/secrets/SSH_PRIVATE_KEY",
+                "bind": "/home/ubuntu/.ssh/id_rsa",
+                "readonly": true
             },
             {
                 "container": "/var/lib/mysql"
@@ -325,8 +326,9 @@
         ],
         "volumes": [
             {
-                "container": "/run/secrets/SSH_PRIVATE_KEY",
-                "bind": "/home/ubuntu/.ssh/id_rsa"
+               "container": "/run/secrets/SSH_PRIVATE_KEY",
+                "bind": "/home/ubuntu/.ssh/id_rsa",
+                "readonly": true
             },
             {
                 "container": "/var/lib/mysql"
@@ -450,8 +452,9 @@
         ],
         "volumes": [
             {
-                "container": "/run/secrets/SSH_PRIVATE_KEY",
-                "bind": "/home/ubuntu/.ssh/id_rsa"
+               "container": "/run/secrets/SSH_PRIVATE_KEY",
+                "bind": "/home/ubuntu/.ssh/id_rsa",
+                "readonly": true
             },
             {
                 "container": "/var/lib/mysql"
@@ -666,8 +669,9 @@
         ],
         "volumes": [
             {
-                "container": "/run/secrets/SSH_PRIVATE_KEY",
-                "bind": "/home/ubuntu/.ssh/id_rsa"
+               "container": "/run/secrets/SSH_PRIVATE_KEY",
+                "bind": "/home/ubuntu/.ssh/id_rsa",
+                "readonly": true
             },
             {
                 "container": "/var/lib/mysql"
