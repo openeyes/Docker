@@ -42,6 +42,13 @@
                 "preset": true
             },
             {
+                "label": "Instituiton Code (optional)",
+                "name": "OE_INSTITUTION_CODE",
+                "default": "NEW",
+                "description": "The ODS institution code for the customer (e.g, RP6 = Moorfields) (optional - only really needed if Enable Optom Portal is 'Yes')",
+                "preset": true
+            },
+            {
                 "label": "Track Commits",
                 "name": "TRACK_NEW_GIT_COMMITS",
                 "default": "FALSE",
@@ -382,6 +389,13 @@
                 "label": "Local Database",
                 "name": "LOCAL_DB",
                 "default": "TRUE",
+                "preset": true
+            },
+            {
+                "label": "Instituiton Code (optional)",
+                "name": "OE_INSTITUTION_CODE",
+                "default": "NEW",
+                "description": "The ODS institution code for the customer (e.g, RP6 = Moorfields) (optional - only really needed if Enable Optom Portal is 'Yes')",
                 "preset": true
             },
             {
