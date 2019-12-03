@@ -1,4 +1,4 @@
-version: '3.4'
+version: "3.4"
 
 services:
   traefik:
@@ -27,7 +27,7 @@ services:
       - "traefik.frontend.headers.browserXSSFilter=true"
       - "traefik.frontend.headers.contentTypeNosniff=true"
       - "traefik.frontend.headers.forceSTSHeader=true"
-      - "traefik.frontend.headers.SSLHost=abehrdigital.com"
+      - "traefik.frontend.headers.SSLHost=${DOMAINNAME:?}"
       - "traefik.frontend.headers.STSIncludeSubdomains=true"
       - "traefik.frontend.headers.STSPreload=true"
       - "traefik.frontend.headers.frameDeny=true"
@@ -55,7 +55,7 @@ services:
       - "--docker.watch=true"
       - "--docker.exposedbydefault=false"
 
-# Use this command to find any issues: docker-compose logs -tf --tail="50" traefik
+  # Use this command to find any issues: docker-compose logs -tf --tail="50" traefik
 
   portainer:
     image: portainer/portainer:latest
@@ -63,8 +63,8 @@ services:
     restart: always
     ports:
       - "9000:9000"
-# Automatically choose 'Manage the Docker instance where Portainer is running' by adding <--host=unix:///var/run/docker.sock> to the command
-# Automaticlly import the custom openeyes template on first run
+    # Automatically choose 'Manage the Docker instance where Portainer is running' by adding <--host=unix:///var/run/docker.sock> to the command
+    # Automaticlly import the custom openeyes template on first run
     command:
       - "-H"
       - "unix:///var/run/docker.sock"
@@ -83,7 +83,7 @@ services:
       - "traefik.frontend.headers.browserXSSFilter=true"
       - "traefik.frontend.headers.contentTypeNosniff=true"
       - "traefik.frontend.headers.forceSTSHeader=true"
-      - "traefik.frontend.headers.SSLHost=abehrdigital.com"
+      - "traefik.frontend.headers.SSLHost=${DOMAINNAME:?}"
       - "traefik.frontend.headers.STSIncludeSubdomains=true"
       - "traefik.frontend.headers.STSPreload=true"
       - "traefik.frontend.headers.frameDeny=true"
