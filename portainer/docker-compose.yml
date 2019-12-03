@@ -16,6 +16,7 @@ services:
     volumes:
       - ./traefikshared:/shared
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./acme:/etc/traefik/acme
     labels:
       - "traefik.enable=true"
       - "traefik.backend=traefik"
