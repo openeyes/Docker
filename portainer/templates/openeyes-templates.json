@@ -83,8 +83,16 @@
                         "default": true
                     },
                     {
-                        "text": "Nightly",
-                        "value": "0 0 * * *"
+                        "text": "Weekly (Sunday 1am)",
+                        "value": "0 1 * * 0"
+                    },
+                    {
+                        "text": "Monthly (1st at 1am)",
+                        "value": "0 1 1 * *"
+                    },
+                    {
+                        "text": "Nightly (01:30)",
+                        "value": "30 1 * * *"
                     },
                     {
                         "text": "Hourly",
@@ -215,8 +223,16 @@
                         "default": true
                     },
                     {
-                        "text": "Nightly",
-                        "value": "0 0 * * *"
+                        "text": "Weekly (Sunday 1am)",
+                        "value": "0 1 * * 0"
+                    },
+                    {
+                        "text": "Monthly (1st at 1am)",
+                        "value": "0 1 1 * *"
+                    },
+                    {
+                        "text": "Nightly (01:30)",
+                        "value": "30 1 * * *"
                     },
                     {
                         "text": "Hourly",
@@ -433,8 +449,16 @@
                         "default": true
                     },
                     {
-                        "text": "Nightly",
-                        "value": "0 0 * * *"
+                        "text": "Weekly (Sunday 1am)",
+                        "value": "0 1 * * 0"
+                    },
+                    {
+                        "text": "Monthly (1st at 1am)",
+                        "value": "0 1 1 * *"
+                    },
+                    {
+                        "text": "Nightly (01:30)",
+                        "value": "30 1 * * *"
                     },
                     {
                         "text": "Hourly",
@@ -565,8 +589,16 @@
                         "default": true
                     },
                     {
-                        "text": "Nightly",
-                        "value": "0 0 * * *"
+                        "text": "Weekly (Sunday 1am)",
+                        "value": "0 1 * * 0"
+                    },
+                    {
+                        "text": "Monthly (1st at 1am)",
+                        "value": "0 1 1 * *"
+                    },
+                    {
+                        "text": "Nightly (01:30)",
+                        "value": "30 1 * * *"
                     },
                     {
                         "text": "Hourly",
