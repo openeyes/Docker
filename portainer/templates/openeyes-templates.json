@@ -134,7 +134,8 @@
             {
                 "container": "/var/www/openeyes"
             }
-        ]
+        ],
+        "restart_policy": "unless-stopped"
     },
     {
         "type": 1,
@@ -363,7 +364,8 @@
                 "container": "/run/secrets/SSH_AUTHORIZED_KEYS",
                 "bind": "/home/ubuntu/toby/authorized_keys"
             }
-        ]
+        ],
+        "restart_policy": "unless-stopped"
     },
     {
         "type": 1,
@@ -500,7 +502,8 @@
             {
                 "container": "/var/www/openeyes"
             }
-        ]
+        ],
+        "restart_policy": "unless-stopped"
     },
     {
         "type": 1,
@@ -729,6 +732,7 @@
                 "container": "/run/secrets/SSH_AUTHORIZED_KEYS",
                 "bind": "/home/ubuntu/toby/authorized_keys"
             }
-        ]
+        ],
+        "restart_policy": "unless-stopped"
     }
 ]
