@@ -11,15 +11,31 @@ services:
       TZ: "Europe/London"
     stdin_open: true
     tty: true
+    volumes:
+        - "oe-db:/var/lib/mysql"
     ports:
       - "3306:3306"
-    volumes:
-      - "oe-db:/var/lib/mysql"
     command:
       # Changing log_file_size to allow lightning image processing of larger document image events
       - "--innodb_log_file_size"
       - "128M"
-
+      
+  testdb:
+    image: mariadb:10.1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
+      TZ: "Europe/London"
+    stdin_open: true
+    tty: true
+    volumes:
+        - "oe-test-db:/var/lib/mysql"
+    ports:
+      - "3300:3306"
+    command:
+      # Changing log_file_size to allow lightning image processing of larger document image events
+      - "--innodb_log_file_size"
+      - "128M"
+      
   web_7:
     image: appertaopeneyes/web:php7
     container_name: openeyes_web_7
@@ -36,19 +52,21 @@ services:
       OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
       OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
       OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
+      DATABASE_HOST: db
+      DATABASE_PORT: 3306
       OE_PORTAL_ENABLED: "FALSE"
       SSH_SERVER_ENABLE: "TRUE"
-      DATABASE_HOST: "db"
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       PHPI_TEST_SETTING: test-123
       WAIT_HOSTS: "web_5:80"
       WAIT_HOSTS_TIMEOUT: "3000"
     secrets:
       - source: SSH_PRIVATE_KEY
-      - source: SSH_AUTHORIZED_KEYS
     ports:
       - "7777:80"
-      - "22:22"
+      - "23:22"
+    tmpfs:
+      - /tmp
     stdin_open: true
     tty: true
     volumes:
@@ -76,18 +94,18 @@ services:
       OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
       OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
       OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
+      DATABASE_HOST: db
+      DATABASE_PORT: 3306
       OE_PORTAL_ENABLED: "FALSE"
       SSH_SERVER_ENABLE: "TRUE"
-      DATABASE_HOST: "db"
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       PHPI_TEST_SETTING: test-123
       WAIT_HOSTS_TIMEOUT: "300"
     secrets:
       - source: SSH_PRIVATE_KEY
-      - source: SSH_AUTHORIZED_KEYS
     ports:
       - "80:80"
-      - "23:22"
+      - "22:22"
     tmpfs:
       - /tmp
     stdin_open: true
@@ -101,8 +119,8 @@ services:
     hostname: oe-web-php5
 
 volumes:
-  oe-web:
   oe-db:
+  oe-test-db:
   php5_vscode:
   php7_vscode:
 
