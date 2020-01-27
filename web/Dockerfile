@@ -24,6 +24,9 @@ ENV DATABASE_USER="openeyes"
 ## Used by some scripts to determine if they are runing in a container
 ENV DOCKER_CONTAINER="TRUE"
 
+## Enables the Cron service for regular maintenance jobs
+ENV ENABLE_CRON = "TRUE"
+
 ENV GIT_ORG=""
 ENV GIT_USER=""
 ENV GIT_EMAIL=""
