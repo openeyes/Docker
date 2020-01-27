@@ -193,7 +193,7 @@ fi
 [ ! -f /initialised.oe ] && echo "true" > /initialised.oe || :
 
 # start cron (needed for hotlist updates + other tasks depending on configuration)
-[ "${OE_MODE^^}" != "TEST" ] && service cron start || :
+[[ "${OE_MODE^^}" != "TEST" && ${ENABLE_CRON^^} != "FALSE" ]] && service cron start || :
 
 # Start apache
 echo "Starting opeyes apache process..."

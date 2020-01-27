@@ -41,8 +41,10 @@ services:
       DATABASE_HOST: "db"
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       PHPI_TEST_SETTING: test-123
-      WAIT_HOSTS: "web_5:80"
-      WAIT_HOSTS_TIMEOUT: "3000"
+      WAIT_HOSTS: "web_5:80" # Wait for web_5 to startup first - this prevents both containers trying to clone at the same time on first run
+      WAIT_HOSTS_TIMEOUT: "3000" # It can take quite a while for web 5 to start on first run, so we need a long time-out
+      WAIT_SLEEP_INTERVAL: "3" # reduces the number of messages sent to the log while waiting for web_5 to complete its first run
+      ENABLE_CRON: "FALSE" # Remove this for live installs
     secrets:
       - source: SSH_PRIVATE_KEY
       - source: SSH_AUTHORIZED_KEYS
@@ -81,7 +83,8 @@ services:
       DATABASE_HOST: "db"
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       PHPI_TEST_SETTING: test-123
-      WAIT_HOSTS_TIMEOUT: "300"
+      WAIT_HOSTS_TIMEOUT: "300" # It can take a while for the mariadb container to initialise on first run
+      ENABLE_CRON: "FALSE" # Remove this for live installs
     secrets:
       - source: SSH_PRIVATE_KEY
       - source: SSH_AUTHORIZED_KEYS
@@ -96,6 +99,7 @@ services:
       - "oe-web:/var/www/openeyes"
       # Following is useful when using VS COde remote for development
       - "php5_vscode:/root/.vscode-server"
+      - "./init.sh:/init.sh"
     depends_on:
       - db
     hostname: oe-web-php5
