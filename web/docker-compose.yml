@@ -99,7 +99,6 @@ services:
       - "oe-web:/var/www/openeyes"
       # Following is useful when using VS COde remote for development
       - "php5_vscode:/root/.vscode-server"
-      - "./init.sh:/init.sh"
     depends_on:
       - db
     hostname: oe-web-php5
