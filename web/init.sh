@@ -97,7 +97,7 @@ if [ ! -f $WROOT/protected/config/core/common.php ]; then
   [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://github.com/" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
 
   # If openeyes files don't already exist then clone them
-  echo cloning "$cloneswitches $cloneroot${gitroot}/openeyes.git"
+  echo cloning "-b ${BUILD_BRANCH} $cloneswitches $cloneroot${gitroot}/openeyes.git"
   git clone -b ${BUILD_BRANCH} $cloneswitches $cloneroot${gitroot}/openeyes.git $WROOT
 
   newinstall=1
