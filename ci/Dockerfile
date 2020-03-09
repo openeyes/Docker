@@ -12,6 +12,9 @@ ARG DEBIAN_FRONTEND="noninteractive"
 
 ENV OE_MODE="TEST"
 
+# We always want to migrate the database to latest for CI testing
+ENV OE_FORCE_MIGRATE="TRUE"
+
 # Used to pass extra command line switches to phpunit when running in test mode
 ENV PHPUNIT_CLI_SWITCHES=""
 
