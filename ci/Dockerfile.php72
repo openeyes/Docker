@@ -12,6 +12,9 @@ ARG DEBIAN_FRONTEND="noninteractive"
 
 ENV OE_MODE="TEST"
 
+# We always want to migrate the database to latest for CI testing
+ENV OE_FORCE_MIGRATE="TRUE"
+
 # Used to pass extra command line switches to phpunit when running in test mode
 ENV PHPUNIT_CLI_SWITCHES=""
 
@@ -32,20 +35,21 @@ ENV TESTS_TO_RUN="PHPUNIT"
 
 ENV TRACK_NEW_GIT_COMMITS="FALSE"
 
-RUN git clone --single-branch --branch master --depth 1 https://github.com/appertafoundation/sample.git /sample \
-        && unzip /sample/sql/sample_db.zip -d /sample \
-        && service mysql start \
-        && export dbresetsql="drop database if exists openeyes; create database ${DATABASE_NAME:-openeyes}; grant all privileges on ${DATABASE_NAME:-openeyes}.* to '${DATABASE_USER:-openeyes}'@'%' identified by '${DATABASE_PASS:-openeyes}'; flush privileges;" \
-        && [ -n "${MYSQL_ROOT_PASSWORD}" ] && export dbpw="-p${MYSQL_ROOT_PASSWORD}" || export dbpw="" \
-        && echo "" \
-        && eval "echo ***RUNNING COMMAND*** $dbpw -e \"${dbresetsql}\"" \
-        && eval "mysql $dbpw -e \"${dbresetsql}\"" \
-        && echo "" \
-        && echo "Re-importing database... " \
-        && echo "*** RUNING COMMAND*** mysql -u${MYSQL_SUPER_USER} $dbpw -D ${DATABASE_NAME:-'openeyes'} < sample/openeyes_sample_data.sql" \
-        && eval "mysql -u${MYSQL_SUPER_USER} $dbpw -D ${DATABASE_NAME:-'openeyes'} < sample/openeyes_sample_data.sql" \
-        && echo "cleaning up..." \
-        && rm -rf /sample
+### Removed built-in DB due to it being out of date on appertafoundation. The DB will now be built at runtim (which makes tets take an extra 2 -3 mins)
+# RUN git clone --single-branch --branch master --depth 1 https://github.com/appertafoundation/sample.git /sample \
+#         && unzip /sample/sql/sample_db.zip -d /sample \
+#         && service mysql start \
+#         && export dbresetsql="drop database if exists openeyes; create database ${DATABASE_NAME:-openeyes}; grant all privileges on ${DATABASE_NAME:-openeyes}.* to '${DATABASE_USER:-openeyes}'@'%' identified by '${DATABASE_PASS:-openeyes}'; flush privileges;" \
+#         && [ -n "${MYSQL_ROOT_PASSWORD}" ] && export dbpw="-p${MYSQL_ROOT_PASSWORD}" || export dbpw="" \
+#         && echo "" \
+#         && eval "echo ***RUNNING COMMAND*** $dbpw -e \"${dbresetsql}\"" \
+#         && eval "mysql $dbpw -e \"${dbresetsql}\"" \
+#         && echo "" \
+#         && echo "Re-importing database... " \
+#         && echo "*** RUNING COMMAND*** mysql -u${MYSQL_SUPER_USER} $dbpw -D ${DATABASE_NAME:-'openeyes'} < sample/openeyes_sample_data.sql" \
+#         && eval "mysql -u${MYSQL_SUPER_USER} $dbpw -D ${DATABASE_NAME:-'openeyes'} < sample/openeyes_sample_data.sql" \
+#         && echo "cleaning up..." \
+#         && rm -rf /sample
 
 EXPOSE 80 3306 9515
 
