@@ -125,7 +125,7 @@
         "volumes": [
             {
                "container": "/run/secrets/SSH_PRIVATE_KEY",
-                "bind": "/home/ubuntu/.ssh/id_rsa",
+                "bind": "~/.ssh/id_rsa",
                 "readonly": true
             },
             {
@@ -351,7 +351,7 @@
         "volumes": [
             {
                "container": "/run/secrets/SSH_PRIVATE_KEY",
-                "bind": "/home/ubuntu/.ssh/id_rsa",
+                "bind": "~/.ssh/id_rsa",
                 "readonly": true
             },
             {
@@ -493,7 +493,7 @@
         "volumes": [
             {
                "container": "/run/secrets/SSH_PRIVATE_KEY",
-                "bind": "/home/ubuntu/.ssh/id_rsa",
+                "bind": "~/.ssh/id_rsa",
                 "readonly": true
             },
             {
@@ -719,7 +719,7 @@
         "volumes": [
             {
                "container": "/run/secrets/SSH_PRIVATE_KEY",
-                "bind": "/home/ubuntu/.ssh/id_rsa",
+                "bind": "~/.ssh/id_rsa",
                 "readonly": true
             },
             {
