@@ -19,6 +19,7 @@ Use the provided compose file to create a new environemt which includes:
 6. (Recommended) Create a password for the Traefik dashboard
     1. Create a folder named `traefikshared` in the portainer directory
     2. Create a `.htpasswd` file under the `./traefikshared/` folder using the Apache [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) command
+    2.1 e.g. `htpasswd .htpasswd my-user-name`
 7. Start Portainer/Traefik using the command `docker-compose up -d` (the -d flag will start in detatched mode)
     * Note: If you need to view the logs for Traefik then use the command `docker-compose logs -tf --tail="50" traefik`
 8. Portainer and Traefik should now be available!
