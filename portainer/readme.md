@@ -30,3 +30,4 @@ Use the provided compose file to create a new environemt which includes:
 - You will need to set an admin password for Portainer at firt run
 - The portainer templates will only be imported on first run. If you need to reset/refresh, you'll need to do so via the portainer HTTP API (see portainer documentation for more info)
 - You may need to set the permissions on the `acme/acme.json` file to 600 - check Traefik logs to see if they need changing.
+- The default templates assume a valid github ssh certificate with **no password** is available at `/home/ubuntu/.ssh/id_rsa`, so remember to place your certificate there (or you will not be able to access the private repositories and only get gold master builds)
