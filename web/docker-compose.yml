@@ -77,8 +77,9 @@ services:
       # Following is useful when using VS COde remote for development
       - "php7_vscode:/root/.vscode-server"
     depends_on:
-     - "db"
-     - "web_5"
+      - "db"
+      - "web_5"
+      - testdb
     hostname: oe-web-php7
 
   web_5:
@@ -121,6 +122,7 @@ services:
       - "php5_vscode:/root/.vscode-server"
     depends_on:
       - db
+      - testdb
     hostname: oe-web-php5
 
 volumes:
