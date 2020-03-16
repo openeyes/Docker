@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.5"
 
 services:
   traefik:
@@ -93,5 +93,6 @@ services:
 
 networks:
   traefik_proxy:
+    name: traefik_proxy
   local:
     driver: bridge
