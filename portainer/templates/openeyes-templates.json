@@ -106,6 +106,18 @@
                 "name": "TZ",
                 "default": "Europe/London",
                 "description": "Override the time zone (for international users) - uses standard Unix timezone identifiers"
+            },
+            {
+                "label": "Technical Support Provider",
+                "name": "OE_TECH_SUPPORT_PROVIDER",
+                "default": "ABEHR Digital",
+                "preset": true
+            },
+            {
+                "label": "Technical Support Url",
+                "name": "OE_TECH_SUPPORT_URL",
+                "default": "https://acrosshealth.freshdesk.com/",
+                "preset": true
             }
         ],
         "labels": [
@@ -332,6 +344,16 @@
                     }
                 ],
                 "description": "If Yes, will enable an SSH server to run on port 22. Note that authorised keys should be added to /home/ubuntu/toby/authorized_keys on the host"
+            },
+            {
+                "label": "Technical Support Provider",
+                "name": "OE_TECH_SUPPORT_PROVIDER",
+                "default": "ABEHR Digital"
+            },
+            {
+                "label": "Technical Support Url",
+                "name": "OE_TECH_SUPPORT_URL",
+                "default": "https://acrosshealth.freshdesk.com/"
             }
         ],
         "labels": [
@@ -474,6 +496,18 @@
                 "name": "TZ",
                 "default": "Europe/London",
                 "description": "Override the time zone (for international users) - uses standard Unix timezone identifiers"
+            },
+            {
+                "label": "Technical Support Provider",
+                "name": "OE_TECH_SUPPORT_PROVIDER",
+                "default": "ABEHR Digital",
+                "preset": true
+            },
+            {
+                "label": "Technical Support Url",
+                "name": "OE_TECH_SUPPORT_URL",
+                "default": "https://acrosshealth.freshdesk.com/",
+                "preset": true
             }
         ],
         "labels": [
@@ -700,6 +734,16 @@
                     }
                 ],
                 "description": "If Yes, will enable an SSH server to run on port 22. Note that authorised keys should be added to /home/ubuntu/toby/authorized_keys on the host"
+            },
+            {
+                "label": "Technical Support Provider",
+                "name": "OE_TECH_SUPPORT_PROVIDER",
+                "default": "ABEHR Digital"
+            },
+            {
+                "label": "Technical Support Url",
+                "name": "OE_TECH_SUPPORT_PROVIDER",
+                "default": "https://acrosshealth.freshdesk.com/"
             }
         ],
         "labels": [
