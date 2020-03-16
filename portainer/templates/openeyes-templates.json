@@ -111,12 +111,14 @@
                 "label": "Technical Support Provider",
                 "name": "OE_TECH_SUPPORT_PROVIDER",
                 "default": "ABEHR Digital",
+                "description": "This text shows in the about panel as 'Technical support provided by'",
                 "preset": true
             },
             {
                 "label": "Technical Support Url",
                 "name": "OE_TECH_SUPPORT_URL",
                 "default": "https://acrosshealth.freshdesk.com/",
+                "description": "This is the url users will be sent to from the about panel when clicking on 'Technical support provided by'",
                 "preset": true
             }
         ],
@@ -348,12 +350,14 @@
             {
                 "label": "Technical Support Provider",
                 "name": "OE_TECH_SUPPORT_PROVIDER",
-                "default": "ABEHR Digital"
+                "default": "ABEHR Digital",
+                "description": "This text shows in the about panel as 'Technical support provided by'"
             },
             {
                 "label": "Technical Support Url",
                 "name": "OE_TECH_SUPPORT_URL",
-                "default": "https://acrosshealth.freshdesk.com/"
+                "default": "https://acrosshealth.freshdesk.com/",
+                "description": "This is the url users will be sent to from the about panel when clicking on 'Technical support provided by'"
             }
         ],
         "labels": [
@@ -501,12 +505,14 @@
                 "label": "Technical Support Provider",
                 "name": "OE_TECH_SUPPORT_PROVIDER",
                 "default": "ABEHR Digital",
+                "description": "This text shows in the about panel as 'Technical support provided by'",
                 "preset": true
             },
             {
                 "label": "Technical Support Url",
                 "name": "OE_TECH_SUPPORT_URL",
                 "default": "https://acrosshealth.freshdesk.com/",
+                "description": "This is the url users will be sent to from the about panel when clicking on 'Technical support provided by'",
                 "preset": true
             }
         ],
@@ -738,12 +744,14 @@
             {
                 "label": "Technical Support Provider",
                 "name": "OE_TECH_SUPPORT_PROVIDER",
-                "default": "ABEHR Digital"
+                "default": "ABEHR Digital",
+                "description": "This text shows in the about panel as 'Technical support provided by'"
             },
             {
                 "label": "Technical Support Url",
                 "name": "OE_TECH_SUPPORT_PROVIDER",
-                "default": "https://acrosshealth.freshdesk.com/"
+                "default": "https://acrosshealth.freshdesk.com/",
+                "description": "This is the url users will be sent to from the about panel when clicking on 'Technical support provided by'"
             }
         ],
         "labels": [
