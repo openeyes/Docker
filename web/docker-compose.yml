@@ -35,52 +35,6 @@ services:
       # Changing log_file_size to allow lightning image processing of larger document image events
       - "--innodb_log_file_size"
       - "128M"
-      
-  web_7:
-    image: appertaopeneyes/web:php7
-    container_name: openeyes_web_7
-    environment:
-      GIT_USER: ${GIT_USER:?'Please set your github user id in .env file'}
-      TZ: 'Europe/London'
-      UID: '1'
-      GID: '1'
-      OE_MODE: 'DEV'
-      OE_INSTITUTION_CODE: NEW
-      OE_PORTAL_URI: ${OE_PORTAL_URI}
-      OE_PORTAL_EXTERNAL_URI: ${OE_PORTAL_EXTERNAL_URI}
-      OE_PORTAL_USERNAME: ${OE_PORTAL_USERNAME}
-      OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
-      OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
-      OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
-      DATABASE_HOST: db
-      DATABASE_TEST_HOST: testdb
-      DATABASE_PORT: 3306
-      OE_PORTAL_ENABLED: "FALSE"
-      SSH_SERVER_ENABLE: "TRUE"
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
-      PHPI_TEST_SETTING: test-123
-      WAIT_HOSTS: "web_5:80" # Wait for web_5 to startup first - this prevents both containers trying to clone at the same time on first run
-      WAIT_HOSTS_TIMEOUT: "3000" # It can take quite a while for web 5 to start on first run, so we need a long time-out
-      WAIT_SLEEP_INTERVAL: "3" # reduces the number of messages sent to the log while waiting for web_5 to complete its first run
-      ENABLE_CRON: "FALSE" # Remove this for live installs
-    secrets:
-      - source: SSH_PRIVATE_KEY
-    ports:
-      - "7777:80"
-      - "23:22"
-    tmpfs:
-      - /tmp
-    stdin_open: true
-    tty: true
-    volumes:
-      - "oe-web:/var/www/openeyes"
-      # Following is useful when using VS COde remote for development
-      - "php7_vscode:/root/.vscode-server"
-    depends_on:
-      - "db"
-      - "web_5"
-      - testdb
-    hostname: oe-web-php7
 
   web_5:
     image: appertaopeneyes/web:latest
@@ -124,6 +78,50 @@ services:
       - db
       - testdb
     hostname: oe-web-php5
+
+  web_7:
+    image: appertaopeneyes/web:php7
+    container_name: openeyes_web_7
+    environment:
+      GIT_USER: ${GIT_USER:?'Please set your github user id in .env file'}
+      TZ: 'Europe/London'
+      UID: '1'
+      GID: '1'
+      OE_MODE: 'DEV'
+      OE_INSTITUTION_CODE: NEW
+      OE_PORTAL_URI: ${OE_PORTAL_URI}
+      OE_PORTAL_EXTERNAL_URI: ${OE_PORTAL_EXTERNAL_URI}
+      OE_PORTAL_USERNAME: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
+      OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
+      OE_PORTAL_ENABLED: "FALSE"
+      SSH_SERVER_ENABLE: "TRUE"
+      DATABASE_HOST: "db"
+      DATABASE_TEST_HOST: "testdb"
+      DATABASE_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
+      PHPI_TEST_SETTING: test-123
+      WAIT_HOSTS: "web_5:80" # Wait for web_5 to startup first - this prevents both containers trying to clone at the same time on first run
+      WAIT_HOSTS_TIMEOUT: "3000" # It can take quite a while for web 5 to start on first run, so we need a long time-out
+      WAIT_SLEEP_INTERVAL: "3" # reduces the number of messages sent to the log while waiting for web_5 to complete its first run
+      ENABLE_CRON: "FALSE" # Remove this for live installs
+    secrets:
+      - source: SSH_PRIVATE_KEY
+      - source: SSH_AUTHORIZED_KEYS
+    ports:
+      - "7777:80"
+      - "23:22"
+    stdin_open: true
+    tty: true
+    volumes:
+      - "oe-web:/var/www/openeyes"
+      # Following is useful when using VS COde remote for development
+      - "php7_vscode:/root/.vscode-server"
+    depends_on:
+     - "db"
+     - "web_5"
+    hostname: oe-web-php7
 
 volumes:
   oe-db:
