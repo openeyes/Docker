@@ -35,6 +35,8 @@ ENV TESTS_TO_RUN="PHPUNIT"
 
 ENV TRACK_NEW_GIT_COMMITS="FALSE"
 
+ENV USE_DEMO_DATA="FALSE"
+
 ### Removed built-in DB due to it being out of date on appertafoundation. The DB will now be built at runtim (which makes tets take an extra 2 -3 mins)
 # RUN git clone --single-branch --branch master --depth 1 https://github.com/appertafoundation/sample.git /sample \
 #         && unzip /sample/sql/sample_db.zip -d /sample \
