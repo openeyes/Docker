@@ -88,7 +88,7 @@ RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_
     && rm -rf /tmp/*
 
 # Dependencies for Puppeteer headless chrome browser - only install if PHP ver > 7
-RUN [ $(echo "7 <= ${PHP_VERSION}" | bc -l) = 1 ] && apt-get update && apt-get install -y --no-install-recommends \
+RUN [ $(echo "7 <= ${PHP_VERSION}" | bc -l) = 1 ] && { apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     fonts-liberation \
     gconf-service \
@@ -127,7 +127,7 @@ RUN [ $(echo "7 <= ${PHP_VERSION}" | bc -l) = 1 ] && apt-get update && apt-get i
     libxtst6 \
     lsb-release \
     wget \
-    xdg-utils || : \
+    xdg-utils ; } || : \
     && apt-get autoremove -y && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
