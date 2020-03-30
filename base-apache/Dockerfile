@@ -127,9 +127,9 @@ RUN [ $(echo "7 <= ${PHP_VERSION}" | bc -l) = 1 ] && { apt-get update && apt-get
     libxtst6 \
     lsb-release \
     wget \
-    xdg-utils ; } || : \
+    xdg-utils \
     && apt-get autoremove -y && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* ; } || :
 
 # SETUP apache config
 # Enable add custom PHP and apache settings (including timezone), plus configure SSH
