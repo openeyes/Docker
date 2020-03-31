@@ -87,6 +87,50 @@ RUN wget -O /wkhtml.deb https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_
     && rm /wkhtml.deb \
     && rm -rf /tmp/*
 
+# Dependencies for Puppeteer headless chrome browser - only install if PHP ver > 7
+RUN [ $(echo "7 <= ${PHP_VERSION}" | bc -l) = 1 ] && { apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    fonts-liberation \
+    gconf-service \
+    libappindicator1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgcc1 \
+    libgconf-2-4 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libstdc++6 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    lsb-release \
+    wget \
+    xdg-utils \
+    && apt-get autoremove -y && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/* ; } || :
+
 # SETUP apache config
 # Enable add custom PHP and apache settings (including timezone), plus configure SSH
 COPY 99-openeyes.ini /etc/php/${PHP_VERSION}/apache2/conf.d/99-openeyes.ini
@@ -109,15 +153,6 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "unlink('composer-setup.php');" \
   && mv composer.phar /usr/local/bin/composer \
   && rm -rf /tmp/*
-
-# As mcrypt was retired in php7.2, we have to complie it from pecl
-# which SIGNIFICANTLY increases image size. 
-# this is temporary until mcrypt is removed from OpenEyes (it is only used by OphCoCvi module for signature encryption)
-COPY mcrypt-pecl-install.sh mcrypt-pecl-install.sh
-# RUN [ $(echo "${PHP_VERSION} > 7.1" | bc -l) = 1 ] && bash mcrypt-pecl-install.sh || :
-
-## Note that mcrypt install for 7.2+ is currently commented out, awaiting outcome of https://github.com/openeyes/OpenEyes/issues/3421
-## run /mcrypt-pecl-install.sh manually if mcrypt is needed for testing (or uncomment the previous RUN line in the dockerfile and rebuild)
 
 EXPOSE 80 3306 22
 
