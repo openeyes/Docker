@@ -101,7 +101,7 @@ The key to be used for encryption and decryption of the email account password n
 
 To generate a key having 64 characters in hex format, execute the following command in terminal -
 
-`openssl rand -hex 32
+`openssl rand -hex 32`
 
 In the above command, 32 indicates the number of random bytes to print. -hex prints those bytes in the hex format - 2 characters per byte, so 64 characters.
 
