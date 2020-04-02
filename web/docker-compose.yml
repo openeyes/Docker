@@ -19,6 +19,10 @@ services:
       # Changing log_file_size to allow lightning image processing of larger document image events
       - "--innodb_log_file_size"
       - "128M"
+      # disable binary logging (as not needed for development, but logs MUST be enabled for production)
+      - "--disable-log-bin"
+      # Uncomment the next line for testing, or to use 10.4 with older versions of OE (prior to v4.0)
+      # - "--sql-mode=NO_ENGINE_SUBSTITUTION,NO_AUTO_CREATE_USER"
 
   web_5:
     image: appertaopeneyes/web:latest

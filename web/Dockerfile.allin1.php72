@@ -78,7 +78,7 @@ RUN chgrp -R www-data $WROOT
 # install grunt-cli and pre-cache some of the composer dependencies so they install quicker during first run
 RUN     npm install -q -g grunt-cli \
         && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.json \
-        && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.json -O /tmp/composer.lock \
+        && wget https://raw.githubusercontent.com/AppertaFoundation/openeyes/master/composer.lock -O /tmp/composer.lock \
         && cd /tmp \
         && COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-autoloader --no-scripts \
         && COMPOSER_MEMORY_LIMIT=-1 composer update --prefer-dist --no-autoloader --no-scripts \
@@ -104,4 +104,5 @@ RUN chmod a+rx /init.sh \
 
 EXPOSE 80 3306 22
 
-ENTRYPOINT ["/init.sh"]
+# Run init script using tini (for better garbage collection and memory management)
+ENTRYPOINT ["/tini", "--", "/init.sh"]

@@ -54,5 +54,3 @@ ENV USE_DEMO_DATA="FALSE"
 #         && rm -rf /sample
 
 EXPOSE 80 3306 9515
-
-ENTRYPOINT ["/init.sh"]
