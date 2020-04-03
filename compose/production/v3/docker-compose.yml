@@ -1,0 +1,105 @@
+version: '3.4'
+
+## PLEASE provide values for relevant environment variables (e.g, GIT_USER) in an accompanying .env file
+## the .env file will not be checked in to version control
+
+services:
+  db:
+    image: mariadb:10.1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
+      TZ: "Europe/London"
+    stdin_open: true
+    tty: true
+    ports:
+      - "3306:3306"
+    volumes:
+      - "oe-db:/var/lib/mysql"
+    command:
+      # Changing log_file_size to allow lightning image processing of larger document image events
+      - "--innodb_log_file_size"
+      - "128M"
+      # disable binary logging (as not needed for development, but logs MUST be enabled for production)
+      - "--disable-log-bin"
+      # Uncomment the next line for testing, or to use 10.4 with older versions of OE (prior to v4.0)
+      # - "--sql-mode=NO_ENGINE_SUBSTITUTION,NO_AUTO_CREATE_USER"
+
+  mirth:
+    image: fabrom/mirth-connect
+    volumes:
+      - "./mirth-connect/mirth.properties:/opt/mirth-connect/conf/mirth.properties:rw"
+      - "./data/spools/:/var/spool/mirth/:rw"
+    ports: 
+      - "8080:8080"
+      - "8443:8443"
+    links:
+      - db:mysql
+    depends_on:
+      - db
+
+  web:
+    image: appertaopeneyes/web:latest
+    environment:
+      GIT_USER: ${GIT_USER}
+      TZ: 'Europe/London'
+      UID: '1'
+      GID: '1'
+      OE_MODE: 'DEV'
+      OE_INSTITUTION_CODE: NEW
+      OE_PORTAL_URI: ${OE_PORTAL_URI}
+      OE_PORTAL_EXTERNAL_URI: ${OE_PORTAL_EXTERNAL_URI}
+      OE_PORTAL_USERNAME: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_PASSWORD: ${OE_PORTAL_PASSWORD}
+      OE_PORTAL_CLIENT_ID: ${OE_PORTAL_USERNAME}
+      OE_PORTAL_CLIENT_SECRET: ${OE_PORTAL_CLIENT_SECRET}
+      OE_PORTAL_ENABLED: "FALSE"
+      SSH_SERVER_ENABLE: "FALSE"
+      DATABASE_HOST: "db"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
+      PHPI_TEST_SETTING: test-123
+      WAIT_HOSTS: "mirth:8080"
+      WAIT_HOSTS_TIMEOUT: "300" # It can take a while for the mariadb container to initialise on first run
+      ENABLE_CRON: "TRUE" 
+    secrets:
+      - source: SSH_PRIVATE_KEY
+      - source: SSH_AUTHORIZED_KEYS
+    ports:
+      - "80:80"
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
+    volumes:
+      - "oe-web:/var/www/openeyes"
+    depends_on:
+      - db
+      # - mirth
+    hostname: oe-web
+
+
+# mirth-database:
+#     container_name: mc-mysql
+#     image: mysql:5.6
+#     command: mysqld --innodb-buffer-pool-size=20M
+#     volumes:
+#       - "./data/db:/var/lib/mysql:rw"
+#     environment:
+#       - "MYSQL_DATABASE=mirth-test"
+#       - "MYSQL_USER=mirth"
+#       - "MYSQL_PASSWORD=password"
+#       - "MYSQL_ROOT_PASSWORD=password"
+#     ports: 
+#       - "3306:3306"
+# ​
+
+volumes:
+  oe-web:
+  oe-db:
+  php5_vscode:
+  php7_vscode:
+
+secrets:
+  SSH_PRIVATE_KEY:
+    file: ~/.ssh/id_rsa
+  SSH_AUTHORIZED_KEYS:
+    file: ~/.ssh/id_rsa.pub
