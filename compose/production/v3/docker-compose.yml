@@ -24,18 +24,18 @@ services:
       # Uncomment the next line for testing, or to use 10.4 with older versions of OE (prior to v4.0)
       # - "--sql-mode=NO_ENGINE_SUBSTITUTION,NO_AUTO_CREATE_USER"
 
-  mirth:
-    image: fabrom/mirth-connect
-    volumes:
-      - "./mirth-connect/mirth.properties:/opt/mirth-connect/conf/mirth.properties:rw"
-      - "./data/spools/:/var/spool/mirth/:rw"
-    ports: 
-      - "8080:8080"
-      - "8443:8443"
-    links:
-      - db:mysql
-    depends_on:
-      - db
+  # mirth:
+  #   image: fabrom/mirth-connect
+  #   volumes:
+  #     - "./mirth-connect/mirth.properties:/opt/mirth-connect/conf/mirth.properties:rw"
+  #     - "./data/spools/:/var/spool/mirth/:rw"
+  #   ports: 
+  #     - "8080:8080"
+  #     - "8443:8443"
+  #   links:
+  #     - db:mysql
+  #   depends_on:
+  #     - db
 
   web:
     image: appertaopeneyes/web:latest
