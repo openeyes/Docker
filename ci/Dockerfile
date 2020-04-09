@@ -37,21 +37,22 @@ ENV TRACK_NEW_GIT_COMMITS="FALSE"
 
 ENV USE_DEMO_DATA="FALSE"
 
-### Removed built-in DB due to it being out of date on appertafoundation. The DB will now be built at runtim (which makes tets take an extra 2 -3 mins)
-# RUN git clone --single-branch --branch master --depth 1 https://github.com/appertafoundation/sample.git /sample \
-#         && unzip /sample/sql/sample_db.zip -d /sample \
-#         && service mysql start \
-#         && export dbresetsql="drop database if exists openeyes; create database ${DATABASE_NAME:-openeyes}; grant all privileges on ${DATABASE_NAME:-openeyes}.* to '${DATABASE_USER:-openeyes}'@'%' identified by '${DATABASE_PASS:-openeyes}'; flush privileges;" \
-#         && [ -n "${MYSQL_ROOT_PASSWORD}" ] && export dbpw="-p${MYSQL_ROOT_PASSWORD}" || export dbpw="" \
-#         && echo "" \
-#         && eval "echo ***RUNNING COMMAND*** $dbpw -e \"${dbresetsql}\"" \
-#         && eval "mysql $dbpw -e \"${dbresetsql}\"" \
-#         && echo "" \
-#         && echo "Re-importing database... " \
-#         && echo "*** RUNING COMMAND*** mysql -u${MYSQL_SUPER_USER} $dbpw -D ${DATABASE_NAME:-'openeyes'} < sample/openeyes_sample_data.sql" \
-#         && eval "mysql -u${MYSQL_SUPER_USER} $dbpw -D ${DATABASE_NAME:-'openeyes'} < sample/openeyes_sample_data.sql" \
-#         && echo "cleaning up..." \
-#         && rm -rf /sample
+## build latest master db into the conatiner to save 2-3 minutes off test run time
+## NOTE: if the apperta repo gets particularly far behind, then this can cause issues
+RUN git clone --single-branch --branch master --depth 1 --single-branch https://github.com/appertafoundation/sample.git /sample \
+        && unzip /sample/sql/sample_db.zip -d /sample \
+        && service mysql start \
+        && export dbresetsql="drop database if exists openeyes; create database ${DATABASE_NAME:-openeyes}; grant all privileges on ${DATABASE_NAME:-openeyes}.* to '${DATABASE_USER:-openeyes}'@'%' identified by '${DATABASE_PASS:-openeyes}'; flush privileges;" \
+        && [ -n "${MYSQL_ROOT_PASSWORD}" ] && export dbpw="-p${MYSQL_ROOT_PASSWORD}" || export dbpw="" \
+        && echo "" \
+        && eval "echo ***RUNNING COMMAND*** $dbpw -e \"${dbresetsql}\"" \
+        && eval "mysql $dbpw -e \"${dbresetsql}\"" \
+        && echo "" \
+        && echo "Re-importing database... " \
+        && echo "*** RUNING COMMAND*** mysql -u${MYSQL_SUPER_USER} $dbpw -D ${DATABASE_NAME:-'openeyes'} < sample/openeyes_sample_data.sql" \
+        && eval "mysql -u${MYSQL_SUPER_USER} $dbpw -D ${DATABASE_NAME:-'openeyes'} < sample/openeyes_sample_data.sql" \
+        && echo "cleaning up..." \
+        && rm -rf /sample
 
 EXPOSE 80 3306 9515
 
