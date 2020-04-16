@@ -119,6 +119,9 @@ if [ ! -f /initialised.oe ]; then
     [ "${OE_MODE^^}" = "TEST" ] && resetparams="${resetparams} -b master" : resetparams="${resetparams} -b $BUILD_BRANCH"
     $WROOT/protected/scripts/oe-reset.sh $resetparams
   fi
+
+  # Do an initial import of HSCIC data if a region (england, scotland or ni) is specified
+  [ ! -z ${OE_HSCIC_REGION} ] && bash $WROOT/protected/scripts/import-hscic-data.sh --region ${OE_HSCIC_REGION} || :
   
 fi
 
