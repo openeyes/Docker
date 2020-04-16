@@ -102,4 +102,5 @@ RUN chmod a+rx /init.sh \
 
 EXPOSE 80 3306 22
 
-ENTRYPOINT ["/init.sh"]
+# Run init script using tini (for better garbage collection and memory management)
+ENTRYPOINT ["/tini", "--", "/init.sh"]

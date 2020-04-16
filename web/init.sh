@@ -112,10 +112,12 @@ if [ ! -f /initialised.oe ]; then
   $WROOT/protected/scripts/install-oe.sh $initparams
 
   if [ "$db_pre_exist" != "1" ] || [ "${OE_FORCE_DB_RESET^^}" = "TRUE" ]; then
-    #If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
+    # If DB doesn't exist then create it - if ENV sample=demo, etc, then call oe-reset (--demo) --no-dependencies --no-migrate
     echo "Database host=${DATABASE_HOST:-'localhost'}; user=${MYSQL_SUPER_USER:-'openeyes'}; name=${DATABASE_NAME:-'openeyes'} was not fount. Creating a new db"
     [ "${USE_DEMO_DATA^^}" = "TRUE" ] && resetparams="--demo" || resetparams=""
-    $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH $resetparams
+    # Always use master branch in TEST mode (otherwise it ends up using the develop branch, which may be ahead of what you're trying to test!)
+    [ "${OE_MODE^^}" = "TEST" ] && resetparams="${resetparams} -b master" : resetparams="${resetparams} -b $BUILD_BRANCH"
+    $WROOT/protected/scripts/oe-reset.sh $resetparams
   fi
   
 fi
