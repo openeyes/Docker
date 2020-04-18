@@ -127,7 +127,17 @@ fi
 
 # If the database pre-existed AND we are in test mode, then automatically run the latest migrations
 # Or also if OE_FORCE_MIGRATE=TRUE then force the migration
-[ "$db_pre_exist" = "1" ] && { [[ "${OE_MODE^^}" = "TEST" || "${OE_FORCE_MIGRATE^^}" = "TRUE" ]] && $WROOT/protected/scripts/oe-migrate.sh -q || : ; } || :
+if [ "$db_pre_exist" = "1" ]; then 
+  if [[ "${OE_MODE^^}" = "TEST" || "${OE_FORCE_MIGRATE^^}" = "TRUE" ]]; then
+    $WROOT/protected/scripts/oe-migrate.sh -q
+    if grep -q "applied" $WROOT/protected/runtime/migrate.log >/dev/null ; then
+      echo "The following migrations were applied..."
+      grep applied $WROOT/protected/runtime/migrate.log
+    else
+      echo "No migrations were applied"
+    fi
+  fi
+fi
 
 [[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && { echo -e "\n\nDependencies not found, installing now...\n\n"; $WROOT/protected/scripts/oe-fix.sh; } || :
 
@@ -184,8 +194,6 @@ fi
 
 # update profile shortcuts
 $WROOT/protected/scripts/set-profile.sh
-
-[[ "${OE_PORTAL_ENABLED^^}" = "TRUE" && ! -f /etc/cron.d/portalexams ]] && { echo "*/5  * * * *  root  . /env.sh; /var/www/openeyes/protected/yiic portalexams >> $WROOT/protected/runtime/portalexams.log 2>&1" > /etc/cron.d/portalexams; chmod 0644 /etc/cron.d/portalexams; } | :
 
 # store environment to file - needed for cron jobs
 if [ ! -f "/env.sh" ]; then 
