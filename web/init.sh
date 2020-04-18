@@ -27,10 +27,10 @@ export DEBIAN_FRONTEND=noninteractive
 echo "Setting Timezone to ${TZ:-'Europe/London'}"
 # Set system timezone
 grep -q "$TZ" /etc/timezone >/dev/null
-[ $? = 1 ] && { ln -sf /usr/share/zoneinfo/${TZ:-Europe/London} /etc/localtime && echo ${TZ:-'Europe/London'} > /etc/timezone; } || :
+[ $? = 1 ] && { ln -sf /usr/share/zoneinfo/${TZ:-Europe/London} /etc/localtime && echo ${TZ:-'Europe/London'} >/etc/timezone; } || :
 # set PHP/apache timezone (only if changed - to avoid unnecessary extra file layers)
 grep -q "$TZ" /etc/php/${PHP_VERSION}/apache2/conf.d/99-timezone.ini >/dev/null
-[ $? = 1 ] && { echo "date.timezone = ${TZ:-'Europe/London'}" > /etc/php/${PHP_VERSION}/apache2/conf.d/99-timezone.ini && echo "Updated 99-timezone.ini"; } | :
+[ $? = 1 ] && { echo "date.timezone = ${TZ:-'Europe/London'}" >/etc/php/${PHP_VERSION}/apache2/conf.d/99-timezone.ini && echo "Updated 99-timezone.ini"; } | :
 
 echo system date = $(date)
 echo php date = $(php -r 'echo date("l M d H:i:s y") . " " .  ini_get("date.timezone") . "\n";')
@@ -41,12 +41,26 @@ echo php date = $(php -r 'echo date("l M d H:i:s y") . " " .  ini_get("date.time
 # Set ssh key can be done using a secret (SSH_PRIVATE_KEY)or as an ENV variable (SSH_PRIVATE_KEY)
 # All efforts are made to avoid updating a file if it already exists - to minimise FS layers
 mkdir -p /root/.ssh /run/.ssh
-[[ ! -z ${SSH_PRIVATE_KEY} && ! -f /run/.ssh/id_rsa ]] && { echo "USING ENVIRONMENT VARIABLE FOR SSH"; echo "${SSH_PRIVATE_KEY}" > /run/.ssh/id_rsa && chmod 600 /run/.ssh/id_rsa; } || :
-[[ -f /run/secrets/SSH_PRIVATE_KEY && ! -f /run/.ssh/id_rsa ]] && { echo "USING DOCKER SECRET FOR SSH"; cp /run/secrets/SSH_PRIVATE_KEY /run/.ssh/id_rsa && chmod 600 /run/.ssh/id_rsa; } || :
-[[ ! -f /root/.ssh/config && -f /run/.ssh/id_rsa ]] && { echo -e "IdentityFile /run/.ssh/id_rsa\nHost github.com\nStrictHostKeyChecking no" > /root/.ssh/config && chmod 644 /root/.ssh/config; } || :
+[[ ! -z ${SSH_PRIVATE_KEY} && ! -f /run/.ssh/id_rsa ]] && {
+  echo "USING ENVIRONMENT VARIABLE FOR SSH"
+  echo "${SSH_PRIVATE_KEY}" >/run/.ssh/id_rsa && chmod 600 /run/.ssh/id_rsa
+} || :
+[[ -f /run/secrets/SSH_PRIVATE_KEY && ! -f /run/.ssh/id_rsa ]] && {
+  echo "USING DOCKER SECRET FOR SSH"
+  cp /run/secrets/SSH_PRIVATE_KEY /run/.ssh/id_rsa && chmod 600 /run/.ssh/id_rsa
+} || :
+[[ ! -f /root/.ssh/config && -f /run/.ssh/id_rsa ]] && { echo -e "IdentityFile /run/.ssh/id_rsa\nHost github.com\nStrictHostKeyChecking no" >/root/.ssh/config && chmod 644 /root/.ssh/config; } || :
 # Set up authorised keys for SSH server (if provided)
-[[ ! -z "$SSH_AUTHORIZED_KEYS" && ! -f /run/.ssh/authorized_keys ]] && { echo "ADDING SSH AUTHORISED KEYS from ENV"; echo "${SSH_AUTHORIZED_KEYS}" > /run/.ssh/authorized_keys; chmod 644 /run/.ssh/authorized_keys ; } || :
-[[ -f /run/secrets/SSH_AUTHORIZED_KEYS && ! -f /run/.ssh/authorized_keys ]] && { echo "ADDING SSH AUTHORISED KEYS FROM SECRET"; cp /run/secrets/SSH_AUTHORIZED_KEYS /run/.ssh/authorized_keys; chmod 644 /run/.ssh/authorized_keys ; } || :
+[[ ! -z "$SSH_AUTHORIZED_KEYS" && ! -f /run/.ssh/authorized_keys ]] && {
+  echo "ADDING SSH AUTHORISED KEYS from ENV"
+  echo "${SSH_AUTHORIZED_KEYS}" >/run/.ssh/authorized_keys
+  chmod 644 /run/.ssh/authorized_keys
+} || :
+[[ -f /run/secrets/SSH_AUTHORIZED_KEYS && ! -f /run/.ssh/authorized_keys ]] && {
+  echo "ADDING SSH AUTHORISED KEYS FROM SECRET"
+  cp /run/secrets/SSH_AUTHORIZED_KEYS /run/.ssh/authorized_keys
+  chmod 644 /run/.ssh/authorized_keys
+} || :
 
 # If SSH server is enabled, start it early in the process so that it is accessible for debugging
 [ "${SSH_SERVER_ENABLE^^}" == "TRUE" ] && service ssh start
@@ -70,16 +84,16 @@ mkdir -p /root/.ssh /run/.ssh
 # Note that we always add the database server to the list
 [ -z $WAIT_HOSTS ] && export WAIT_HOSTS="${DATABASE_HOST:-'localhost'}:${DATABASE_PORT:-'3306'}" || export WAIT_HOSTS="${DATABASE_HOST:-'localhost'}:${DATABASE_PORT:-'3306'},$WAIT_HOSTS"
 echo "Waitng for host dependencies to become available..."
-if ! /wait = 1; then 
+if ! /wait = 1; then
   echo "Not all dependent hosts were contactable. Exiting."
-  exit; 
+  exit
 fi
 
 # Test to see if database exists - if not we will (re)build it later
 echo Testing Database: host=${DATABASE_HOST:-"localhost"} user=${DATABASE_USER:-"openeyes"} name=${DATABASE_NAME:-"openeyes"}...
 
 # NOTE: The $? on the end of the next line is very important - it converts the output to a 1 or 0
-db_pre_exist=$( ! mysql -A --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "use ${DATABASE_NAME:-'openeyes'};" 2>/dev/null)$?
+db_pre_exist=$(! mysql -A --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "use ${DATABASE_NAME:-'openeyes'};" 2>/dev/null)$?
 
 [ "$db_pre_exist" = "1" ] && echo "...database ${DATABASE_NAME:-'openeyes'} found." || echo "...could not find database ${DATABASE_NAME:-'openeyes'}. It will be (re) created..."
 
@@ -94,7 +108,7 @@ if [ ! -f $WROOT/protected/config/core/common.php ]; then
   ssh git@github.com -T
   [ "$?" == "1" ] && cloneroot="git@github.com:" || cloneroot="https://github.com/"
   # If GIT_ORG is not specified then - If using https we defualt to appertafoundation. If ussing ssh we default to openeyes
-  [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://github.com/" ] && gitroot="appertafoundation" || gitroot="openeyes";} || gitroot=$GIT_ORG
+  [ -z "$GIT_ORG" ] && { [ "$cloneroot" == "https://github.com/" ] && gitroot="appertafoundation" || gitroot="openeyes"; } || gitroot=$GIT_ORG
 
   # If openeyes files don't already exist then clone them
   echo cloning "-b ${BUILD_BRANCH} $cloneswitches $cloneroot${gitroot}/openeyes.git"
@@ -122,15 +136,15 @@ if [ ! -f /initialised.oe ]; then
 
   # Do an initial import of HSCIC data if a region (england, scotland or ni) is specified
   [ ! -z ${OE_HSCIC_REGION} ] && bash $WROOT/protected/scripts/import-hscic-data.sh --region ${OE_HSCIC_REGION} || :
-  
+
 fi
 
 # If the database pre-existed AND we are in test mode, then automatically run the latest migrations
 # Or also if OE_FORCE_MIGRATE=TRUE then force the migration
-if [ "$db_pre_exist" = "1" ]; then 
+if [ "$db_pre_exist" = "1" ]; then
   if [[ "${OE_MODE^^}" = "TEST" || "${OE_FORCE_MIGRATE^^}" = "TRUE" ]]; then
     $WROOT/protected/scripts/oe-migrate.sh -q
-    if grep -q "applied" $WROOT/protected/runtime/migrate.log >/dev/null ; then
+    if grep -q "applied" $WROOT/protected/runtime/migrate.log >/dev/null; then
       echo "The following migrations were applied..."
       grep applied $WROOT/protected/runtime/migrate.log
     else
@@ -139,32 +153,34 @@ if [ "$db_pre_exist" = "1" ]; then
   fi
 fi
 
-[[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && { echo -e "\n\nDependencies not found, installing now...\n\n"; $WROOT/protected/scripts/oe-fix.sh; } || :
+[[ ! -d "$WROOT/node_modules" || ! -d "$WROOT/vendor/yiisoft" ]] && {
+  echo -e "\n\nDependencies not found, installing now...\n\n"
+  $WROOT/protected/scripts/oe-fix.sh
+} || :
 
 # Ensure .htaccess is set
 if [ ! -f "$WROOT/.htaccess" ]; then
-    echo Copying .htaccess file
-    cp $WROOT/.htaccess.sample $WROOT/.htaccess
-    sudo chown www-data:www-data $WROOT/.htaccess
+  echo Copying .htaccess file
+  cp $WROOT/.htaccess.sample $WROOT/.htaccess
+  sudo chown www-data:www-data $WROOT/.htaccess
 fi
 
 # ensure index is set
 if [ ! -f "$WROOT/index.php" ]; then
-    echo Copying index.php file
-    cp $WROOT/index.example.php $WROOT/index.php
-    sudo chown www-data:www-data $WROOT/index.php
+  echo Copying index.php file
+  cp $WROOT/index.example.php $WROOT/index.php
+  sudo chown www-data:www-data $WROOT/index.php
 fi
 
-
 # Set github user and email config (if provided)
-[[ -z $(git config --global user.name)  && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $(git config --global user.name)"; } || :
+[[ -z $(git config --global user.name) && ! -z $GIT_USER ]] && { git config --global user.name "$GIT_USER" && echo "git global user set to $(git config --global user.name)"; } || :
 if [[ -z $(git config --global user.email) && ! -z $GIT_USER ]]; then
   # if an email has been explicitly provided, use it. Else use default gitbug no reply user address
-  if [ ! -z $GIT_EMAIL ]; then 
+  if [ ! -z $GIT_EMAIL ]; then
     git config --global user.email "$GIT_EMAIL"
   else
     git config --global user.email "${GIT_USER}@users.noreply.github.com"
-  fi 
+  fi
   echo "git global email set to $(git config --global user.email)"
 fi
 
@@ -174,7 +190,7 @@ if [ "${TRACK_NEW_GIT_COMMITS^^}" == "TRUE" ]; then
   echo "** -= This container automatically pulls from git every 30 minutes =- **"
   echo "************************************************************************"
 
-  [ ! -f /etc/cron.d/track_git ] && echo -e "# /etc/cron.d/track_git: Update to latest git code every 30 minutes\n*/30 * * * *   root . /env.sh; /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" > /etc/cron.d/track_git | :
+  [ ! -f /etc/cron.d/track_git ] && echo -e "# /etc/cron.d/track_git: Update to latest git code every 30 minutes\n*/30 * * * *   root . /env.sh; /var/www/openeyes/protected/scripts/oe-update.sh -f >/dev/null 2>&1" >/etc/cron.d/track_git | :
 
 fi
 
@@ -182,10 +198,10 @@ if [ ! -z "${RESET_DB_CRON}" ]; then
   echo ""
   echo "*****************************************************************************"
   echo "** -= This container automatically resets the database on the following =- **"
-  echo "** -=               cron schedule: ${RESET_DB_CRON}                 =- **"
+  echo "** -=               cron schedule: ${RESET_DB_CRON}                     =- **"
   echo "*****************************************************************************"
 
-  [ ! -f /etc/cron.d/reset_db ] && echo -e "# /etc/cron.d/reset_db: Reset openeyes database on regular schedule\n${RESET_DB_CRON}   root . /env.sh; /var/www/openeyes/protected/scripts/oe-reset.sh --demo >/dev/null 2>&1" > /etc/cron.d/reset_db | :
+  [ ! -f /etc/cron.d/reset_db ] && echo -e "# /etc/cron.d/reset_db: Reset openeyes database on regular schedule\n${RESET_DB_CRON}   root . /env.sh; /var/www/openeyes/protected/scripts/oe-reset.sh --demo >/dev/null 2>&1" >/etc/cron.d/reset_db | :
 
 fi
 
@@ -196,14 +212,14 @@ fi
 $WROOT/protected/scripts/set-profile.sh
 
 # store environment to file - needed for cron jobs
-if [ ! -f "/env.sh" ]; then 
-  env | sed -r "s/'/\\\'/gm" | sed -r "s/^([^=]+=)(.*)\$/export \1'\2'/gm" > /env.sh; chmod a+x /env.sh
+if [ ! -f "/env.sh" ]; then
+  env | sed -r "s/'/\\\'/gm" | sed -r "s/^([^=]+=)(.*)\$/export \1'\2'/gm" >/env.sh
+  chmod a+x /env.sh
   # Remove some unwanted env settings (these can confuse other system behaviour if left in)
   sed -i -E '/\sPATH=|\s_=|\sSHLVL=|\sTERM=|\sPWD=|\sDEBIAN_/d' /env.sh
 fi
 
-
-[ ! -f /initialised.oe ] && echo "true" > /initialised.oe || :
+[ ! -f /initialised.oe ] && echo "true" >/initialised.oe || :
 
 # start cron (needed for hotlist updates + other tasks depending on configuration)
 [[ "${OE_MODE^^}" != "TEST" && ${ENABLE_CRON^^} != "FALSE" ]] && service cron start || :
@@ -216,55 +232,68 @@ echo "*********************************************"
 echo "**       -= END OF STARTUP SCRIPT =-       **"
 echo "*********************************************"
 # Send output of openeyeyes application log to stdout - for viewing with docker logs
-[ ! -f $WROOT/protected/runtime/application.log ] && { touch $WROOT/protected/runtime/application.log; chmod 664 $WROOT/protected/runtime/application.log; } | :
-[ ! -f $WROOT/protected/runtime/portalexams.log ] && { touch $WROOT/protected/runtime/portalexams.log; chmod 664 $WROOT/protected/runtime/portalexams.log; } | :
-[ ! -f /var/log/php_errors.log ] && { touch /var/log/php_errors.log; chmod 664 /var/log/php_errors.log; } | :
+[ ! -f $WROOT/protected/runtime/application.log ] && {
+  touch $WROOT/protected/runtime/application.log
+  chmod 664 $WROOT/protected/runtime/application.log
+} | :
+[ ! -f $WROOT/protected/runtime/portalexams.log ] && {
+  touch $WROOT/protected/runtime/portalexams.log
+  chmod 664 $WROOT/protected/runtime/portalexams.log
+} | :
+[ ! -f /var/log/php_errors.log ] && {
+  touch /var/log/php_errors.log
+  chmod 664 /var/log/php_errors.log
+} | :
 tail -n0 $WROOT/protected/runtime/application.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"App Log:"$0}' &
 tail -n0 $WROOT/protected/runtime/portalexams.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"Portal Log:"$0}' &
 tail -n0 /var/log/php_errors.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"PHP Log:"$0}' &
 
 # note - the ^^ converts to uppercase (,, can be used to convert to lowercase)
-if [ ${OE_MODE^^} = "TEST" ]; then 
+if [ ${OE_MODE^^} = "TEST" ]; then
   ## TESTS_TO_RUN is a semi-colon separated list of tests
-  [ ! -z "$TESTS_TO_RUN" ] && { IFS=';' read -ra tests <<< "$TESTS_TO_RUN"; echo "Will auto-run the following test(s): ${tests[*]}"; } || echo "Tests will not run automatically. To auto-start tests, set the TESTS_TO_RUN env variable (semi-colon separated list)"
+  [ ! -z "$TESTS_TO_RUN" ] && {
+    IFS=';' read -ra tests <<<"$TESTS_TO_RUN"
+    echo "Will auto-run the following test(s): ${tests[*]}"
+  } || echo "Tests will not run automatically. To auto-start tests, set the TESTS_TO_RUN env variable (semi-colon separated list)"
 
   # If tests are specified, run them automatically. Else, continue as normal
-  if [ "${#tests[@]}" -gt 0 ]; then 
+  if [ "${#tests[@]}" -gt 0 ]; then
     echo "STARING TESTS..."
-  
+
     result=0
 
-    for i in "${!tests[@]}"
-    do
+    for i in "${!tests[@]}"; do
       lastresult=-1
 
-        if [ "${tests[i]^^}" = "PHPUNIT" ]; then
-          echo "*** RUNNING PHPUNIT ***" 
-          [ ! -z ${PHPUNIT_CLI_SWITCHES} ] && echo " With extra switches: ${PHPUNIT_CLI_SWITCHES}"
-          $WROOT/protected/scripts/oe-unit-tests.sh ${PHPUNIT_CLI_SWITCHES}
-          lastresult=$?
-        elif [ "${tests[i]^^}" = "BEHAT" ]; then
-          echo "*** RUNNING BEHAT ***" 
-          service apache2 start
-          $WROOT/protected/scripts/oe-behat-tests.sh${BEHAT_CONFIG_PATH:+ --config $BEHAT_CONFIG_PATH}${BEHAT_CLI_SWITCHES:+ $BEHAT_CLI_SWITCHES}${BEHAT_TEST_PATH:+ --test $BEHAT_TEST_PATH}
-          lastresult=$?
-          service apache2 stop 2>/dev/null
-        else
-          echo "*** ERROR: Test '${tests[i]^^}' from TESTS_TO_RUN was not recognised. Skipping. ****"
-        fi
+      if [ "${tests[i]^^}" = "PHPUNIT" ]; then
+        echo "*** RUNNING PHPUNIT ***"
+        [ ! -z ${PHPUNIT_CLI_SWITCHES} ] && echo " With extra switches: ${PHPUNIT_CLI_SWITCHES}"
+        $WROOT/protected/scripts/oe-unit-tests.sh ${PHPUNIT_CLI_SWITCHES}
+        lastresult=$?
+      elif [ "${tests[i]^^}" = "BEHAT" ]; then
+        echo "*** RUNNING BEHAT ***"
+        service apache2 start
+        $WROOT/protected/scripts/oe-behat-tests.sh${BEHAT_CONFIG_PATH:+ --config $BEHAT_CONFIG_PATH}${BEHAT_CLI_SWITCHES:+ $BEHAT_CLI_SWITCHES}${BEHAT_TEST_PATH:+ --test $BEHAT_TEST_PATH}
+        lastresult=$?
+        service apache2 stop 2>/dev/null
+      else
+        echo "*** ERROR: Test '${tests[i]^^}' from TESTS_TO_RUN was not recognised. Skipping. ****"
+      fi
 
-        echo Test Result = $lastresult
-        # If any test fails then the final result will = the first error code
-        [ $lastresult -gt 0 ] && result=$lastresult || :
+      echo Test Result = $lastresult
+      # If any test fails then the final result will = the first error code
+      [ $lastresult -gt 0 ] && result=$lastresult || :
 
-        # if this is not the last test, then restet the database
-      [[ $((i + 1)) -lt ${#tests[@]} && -z $NO_RESET_DB_BETWEEN_TESTS ]] && { echo -e "\n\n\n ********** RESETTING DATABASE **********\n\n\n"; $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH; } || :
-      
+      # if this is not the last test, then restet the database
+      [[ $((i + 1)) -lt ${#tests[@]} && -z $NO_RESET_DB_BETWEEN_TESTS ]] && {
+        echo -e "\n\n\n ********** RESETTING DATABASE **********\n\n\n"
+        $WROOT/protected/scripts/oe-reset.sh -b $BUILD_BRANCH
+      } || :
+
     done
     echo Final result of all tests = $result
-    exit $result;
+    exit $result
   fi
 fi
 
 apachectl -DFOREGROUND
-
