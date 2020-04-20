@@ -4,8 +4,8 @@ ARG BUILD_BRANCH="master"
 ARG BUILD_WROOT="/var/www/openeyes"
 ARG BUILD_SAMPLE="TRUE"
 ARG BUILD_LOCAL_DB="FALSE"
-	# By default we expect an external database container to be used
-	# Set this arg to TRUE to install mariadb inside the container
+# By default we expect an external database container to be used
+# Set this arg to TRUE to install mariadb inside the container
 
 ARG DEBIAN_FRONTEND="noninteractive"
 
@@ -91,13 +91,13 @@ RUN [ "$BUILD_LOCAL_DB" = "TRUE" ] && { apt-get update && apt-get install -y --n
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/* \ 
         && rm -rf /tmp/* ; } || : 
-        
+
 
 # Add the init scripts
 COPY init.sh /init.sh
 COPY wait /wait
 RUN chmod a+rx /init.sh \
-    && chmod a+rx /wait
+        && chmod a+rx /wait
 
 
 EXPOSE 80 3306 22
