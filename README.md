@@ -95,3 +95,15 @@ The example compose file creates 3x containers:
 * A PHP7.3 version of the openeyes container (on port 7777)
 
 This demonstrates how 2 instances can connect to the same database and use the same code files. It also allows dual PHP version testing, while we migrate to PHP7.
+
+# Adding certificate for Single-Sign-On
+It is required to import the Okta certificate to Identity Provider. 
+The certificate to be used for Single-Sign-On can be obtained from the Okta portal by following the steps below:
+
+`
+Go to Okta Admin Home Page -> Applications -> Your Apps(SAML) -> General -> SAML Settings -> Edit -> Configure SAML 
+-> Click "Download Okta Certificate" on the right side.
+`
+
+Rename the file from okta.cert to sso.cert and put it in the Docker/web Folder
+Run `docker-compose up`, then the certificate will exist in the docker secret.
