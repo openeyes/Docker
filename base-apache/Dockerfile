@@ -35,6 +35,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
   libreoffice-writer \
   mariadb-client \
   nano \
+  pv \
   ssh \
   unzip \
   xfonts-75dpi \
