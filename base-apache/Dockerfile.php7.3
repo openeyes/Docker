@@ -36,6 +36,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
   mariadb-client \
   nano \
   pv \
+  rsync \
   ssh \
   unzip \
   xfonts-75dpi \
