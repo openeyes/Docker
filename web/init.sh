@@ -23,6 +23,13 @@ See the following urls for more info
 
 "
 export DEBIAN_FRONTEND=noninteractive
+echo "
+PHP info:
+----------------------------------------------------------------
+$(php --version)
+----------------------------------------------------------------
+
+"
 
 echo "Setting Timezone to ${TZ:-'Europe/London'}"
 # Set system timezone
@@ -91,6 +98,15 @@ fi
 
 # Test to see if database exists - if not we will (re)build it later
 echo Testing Database: host=${DATABASE_HOST:-"localhost"} user=${DATABASE_USER:-"openeyes"} name=${DATABASE_NAME:-"openeyes"}...
+
+if [ $(mysql --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "SHOW VARIABLES WHERE Variable_name in  ('version')" >/dev/null 2>&1)$? = 0 ]; then
+  echo -e "\nDatabase info:"
+  echo "-------------------------------------------------------"
+  mysql --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "SHOW VARIABLES WHERE Variable_name in  ('version', 'innodb_version')" | grep --color=never version
+  echo -e "-------------------------------------------------------"
+else
+  echo -e "\n\n!!! Could note retrive database version info !!!\n\n"
+fi
 
 # NOTE: The $? on the end of the next line is very important - it converts the output to a 1 or 0
 db_pre_exist=$(! mysql -A --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "use ${DATABASE_NAME:-'openeyes'};" 2>/dev/null)$?
