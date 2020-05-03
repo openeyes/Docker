@@ -47,6 +47,9 @@ services:
       PHPI_TEST_SETTING: test-123
       WAIT_HOSTS_TIMEOUT: "300" # It can take a while for the mariadb container to initialise on first run
       ENABLE_CRON: "FALSE" # Remove this for live installs
+      SSO_BASE_URL: "" # Base URL for SSO
+      SSO_ENTITY_ID: "" # Entity ID URL obtained from okta portal
+      SSO_APP_EMBED_LINK: "" # embed link obtained from okta portal
     secrets:
       - source: SSH_PRIVATE_KEY
       - source: SSH_AUTHORIZED_KEYS
@@ -91,6 +94,9 @@ services:
 #      WAIT_HOSTS_TIMEOUT: "3000" # It can take quite a while for web 5 to start on first run, so we need a long time-out
 #      WAIT_SLEEP_INTERVAL: "3" # reduces the number of messages sent to the log while waiting for web_5 to complete its first run
 #      ENABLE_CRON: "FALSE" # Remove this for live installs
+#      SSO_BASE_URL: "" # Base URL for SSO
+#      SSO_ENTITY_ID: "" # Entity ID URL obtained from okta portal
+#      SSO_APP_EMBED_LINK: "" # embed link obtained from okta portal
 #    secrets:
 #      - source: SSH_PRIVATE_KEY
 #      - source: SSH_AUTHORIZED_KEYS
