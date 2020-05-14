@@ -5,7 +5,7 @@ version: '3.4'
 
 services:
   db:
-    image: mariadb:10.1
+    image: mariadb:10.4
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       TZ: "Europe/London"
@@ -14,14 +14,14 @@ services:
     volumes:
         - "oe-db:/var/lib/mysql"
     ports:
-      - "3306:3306"
+      - "3333:3306"
     command:
       # Changing log_file_size to allow lightning image processing of larger document image events
       - "--innodb_log_file_size"
       - "128M"
       
   testdb:
-    image: mariadb:10.1
+    image: mariadb:10.4
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
       TZ: "Europe/London"
@@ -39,6 +39,37 @@ services:
       - "--disable-log-bin"
       # Uncomment the next line for testing, or to use 10.4 with older versions of OE (prior to v4.0)
       # - "--sql-mode=NO_ENGINE_SUBSTITUTION,NO_AUTO_CREATE_USER"
+  
+  mirth-database:
+    container_name: mc-mysql
+    image: mysql:5.6
+    command: mysqld --innodb-buffer-pool-size=20M
+    volumes:
+      - "./data/db:/var/lib/mysql:rw"
+    environment:
+      - "MYSQL_DATABASE=mirth-test"
+      - "MYSQL_USER=mirth"
+      - "MYSQL_PASSWORD=password"
+      - "MYSQL_ROOT_PASSWORD=password"
+    ports: 
+      - "3306:3306"
+
+  mirth-connect:
+    image: justulka/mirth
+    container_name: mc-mirthconnect
+    volumes:
+      - "./data/spools/:/var/spool/mirth/:rw"
+      - "/home/toukan/mirthFiles:/mnt/dicom"
+      - "/home/toukan/rawMirthFiles:/mnt/rawDicom"
+    ports: 
+      - "8080:8080"
+      - "8443:8443"
+      - "11119:11119"
+    links:
+      - mirth-database:mysql
+      - web_7
+    depends_on:
+      - mirth-database
 
   web_5:
     image: appertaopeneyes/web:latest
