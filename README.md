@@ -95,3 +95,14 @@ The example compose file creates 3x containers:
 * A PHP7.3 version of the openeyes container (on port 7777)
 
 This demonstrates how 2 instances can connect to the same database and use the same code files. It also allows dual PHP version testing, while we migrate to PHP7.
+
+# Adding key for encryption/decryption
+The key to be used for encryption and decryption of the email account password needs to be stored in the key file under [web folder](https://github.com/openeyes/Docker/tree/master/web).
+
+To generate a key having 64 characters in hex format, execute the following command in terminal -
+
+`openssl rand -hex 32`
+
+In the above command, 32 indicates the number of random bytes to print. -hex prints those bytes in the hex format - 2 characters per byte, so 64 characters.
+
+Copy the randomly generated key and store it in the key file, make sure to set the encoding of the file to UTF-8.
