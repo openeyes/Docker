@@ -23,6 +23,13 @@ See the following urls for more info
 
 "
 export DEBIAN_FRONTEND=noninteractive
+echo "
+PHP info:
+----------------------------------------------------------------
+$(php --version)
+----------------------------------------------------------------
+
+"
 
 echo "Setting Timezone to ${TZ:-'Europe/London'}"
 # Set system timezone
@@ -91,6 +98,15 @@ fi
 
 # Test to see if database exists - if not we will (re)build it later
 echo Testing Database: host=${DATABASE_HOST:-"localhost"} user=${DATABASE_USER:-"openeyes"} name=${DATABASE_NAME:-"openeyes"}...
+
+if [ $(mysql --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "SHOW VARIABLES WHERE Variable_name in  ('version')" >/dev/null 2>&1)$? = 0 ]; then
+  echo -e "\nDatabase info:"
+  echo "-------------------------------------------------------"
+  mysql --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "SHOW VARIABLES WHERE Variable_name in  ('version', 'innodb_version')" | grep --color=never version
+  echo -e "-------------------------------------------------------"
+else
+  echo -e "\n\n!!! Could note retrive database version info !!!\n\n"
+fi
 
 # NOTE: The $? on the end of the next line is very important - it converts the output to a 1 or 0
 db_pre_exist=$(! mysql -A --host=${DATABASE_HOST:-'localhost'} -u $DATABASE_USER "$dbpassword" -e "use ${DATABASE_NAME:-'openeyes'};" 2>/dev/null)$?
@@ -228,25 +244,26 @@ fi
 echo "Starting opeyes apache process..."
 echo "openeyes should now be available in your web browser on your chosen port."
 echo ""
-echo "*********************************************"
-echo "**       -= END OF STARTUP SCRIPT =-       **"
-echo "*********************************************"
-# Send output of openeyeyes application log to stdout - for viewing with docker logs
-[ ! -f $WROOT/protected/runtime/application.log ] && {
-  touch $WROOT/protected/runtime/application.log
-  chmod 664 $WROOT/protected/runtime/application.log
-} | :
-[ ! -f $WROOT/protected/runtime/portalexams.log ] && {
-  touch $WROOT/protected/runtime/portalexams.log
-  chmod 664 $WROOT/protected/runtime/portalexams.log
-} | :
-[ ! -f /var/log/php_errors.log ] && {
-  touch /var/log/php_errors.log
-  chmod 664 /var/log/php_errors.log
-} | :
-tail -n0 $WROOT/protected/runtime/application.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"App Log:"$0}' &
-tail -n0 $WROOT/protected/runtime/portalexams.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"Portal Log:"$0}' &
-tail -n0 /var/log/php_errors.log -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"PHP Log:"$0}' &
+
+## Send output of openeyeyes application log to stdout - for viewing with docker logs
+if [ ! ${OUTPUT_APPLICATION_LOGS^^} != "FALSE" ]; then
+  declare -A logs
+  # [Key]value pairs of [file location] and 'name' for each log to output
+  logs=(["$WROOT/protected/runtime/application.log"]="OE" ["$WROOT/protected/runtime/portalexams.log"]="Portal" ["/var/log/php_errors.log"]="PHP Error" ["/var/log/apache2/access.log"]="Apache" ["/var/log/apache2/error.log"]="Apache Error")
+
+  for key in ${!logs[@]}; do
+
+    # if file does not exist, create it
+    if [ ! -f ${key} ]; then
+      touch ${key}
+      chmod 664 ${key}
+    fi
+
+    echo "Outputting ${key} to stdout as '${logs[${key}]}'"
+    # start tailing the log and continue
+    tail -n0 ${key} -F | awk '/^==> / {a=substr($0, 5, length-8); next} {print a"'"${logs[${key}]}"':"$0}' &
+  done
+fi
 
 # note - the ^^ converts to uppercase (,, can be used to convert to lowercase)
 if [ ${OE_MODE^^} = "TEST" ]; then
@@ -295,5 +312,10 @@ if [ ${OE_MODE^^} = "TEST" ]; then
     exit $result
   fi
 fi
+
+echo ""
+echo "*********************************************"
+echo "**       -= END OF STARTUP SCRIPT =-       **"
+echo "*********************************************"
 
 apachectl -DFOREGROUND

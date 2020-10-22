@@ -54,6 +54,7 @@ services:
       - source: SSH_PRIVATE_KEY
       - source: SSH_AUTHORIZED_KEYS
       - source: SSO_CERTIFICATE
+      - source: SODIUM_CRYPTO_KEY
     ports:
       - "80:80"
       - "22:22"
@@ -101,6 +102,7 @@ services:
 #      - source: SSH_PRIVATE_KEY
 #      - source: SSH_AUTHORIZED_KEYS
 #      - source: SSO_CERTIFICATE
+#      - source: SODIUM_CRYPTO_KEY
 #    ports:
 #      - "7777:80"
 #      - "22:22"
@@ -128,3 +130,5 @@ secrets:
     file: ~/.ssh/id_rsa.pub
   SSO_CERTIFICATE:
     file: sso.cert
+  SODIUM_CRYPTO_KEY:
+    file: key

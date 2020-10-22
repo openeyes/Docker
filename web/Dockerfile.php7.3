@@ -1,13 +1,11 @@
-FROM appertaopeneyes/base-apache:php7.2
+FROM appertaopeneyes/base-apache:php7.3
 
 ARG BUILD_BRANCH="master"
 ARG BUILD_WROOT="/var/www/openeyes"
 ARG BUILD_SAMPLE="TRUE"
-ARG BUILD_LOCAL_DB="TRUE"
-
-## THE REST OF THIS FILE IS IDENTICAL TO THE MAIN web Dockerfile
-## This file exists only to workaround Docjer Hub's daft inability
-## to set build arguments!
+ARG BUILD_LOCAL_DB="FALSE"
+	# By default we expect an external database container to be used
+	# Set this arg to TRUE to install mariadb inside the container
 
 ARG DEBIAN_FRONTEND="noninteractive"
 
@@ -44,6 +42,8 @@ ENV MYSQL_ROOT_PASSWORD=""
 ENV MYSQL_SUPER_USER="root"
 
 ENV OE_DOCMAN_EXPORT_DIRECTORY=""
+ENV OE_DOCMAN_PASSWORD=""
+ENV OE_DOCMAN_USER=""
 ENV OE_MODE="DEV"
 ENV OE_FORCE_MIGRATE="FALSE"
 ENV OE_INSTITUTION_CODE=""

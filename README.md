@@ -96,6 +96,7 @@ The example compose file creates 3x containers:
 
 This demonstrates how 2 instances can connect to the same database and use the same code files. It also allows dual PHP version testing, while we migrate to PHP7.
 
+
 # Adding certificate for Single-Sign-On
 It is required to import the Okta certificate to Identity Provider. 
 The certificate to be used for Single-Sign-On can be obtained from the Okta portal by following the steps below:
@@ -107,3 +108,15 @@ Go to Okta Admin Home Page -> Applications -> Your Apps(SAML) -> General -> SAML
 
 Rename the file from okta.cert to sso.cert and put it in the Docker/web Folder
 Run `docker-compose up`, then the certificate will exist in the docker secret.
+
+
+# Adding key for encryption/decryption
+The key to be used for encryption and decryption of the email account password needs to be stored in the key file under [web folder](https://github.com/openeyes/Docker/tree/master/web).
+
+To generate a key having 64 characters in hex format, execute the following command in terminal -
+
+`openssl rand -hex 32`
+
+In the above command, 32 indicates the number of random bytes to print. -hex prints those bytes in the hex format - 2 characters per byte, so 64 characters.
+
+Copy the randomly generated key and store it in the key file, make sure to set the encoding of the file to UTF-8.
