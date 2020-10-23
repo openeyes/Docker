@@ -47,13 +47,21 @@ services:
       PHPI_TEST_SETTING: test-123
       WAIT_HOSTS_TIMEOUT: "300" # It can take a while for the mariadb container to initialise on first run
       ENABLE_CRON: "FALSE" # Remove this for live installs
-      SSO_BASE_URL: "" # Base URL for SSO
-      SSO_ENTITY_ID: "" # Entity ID URL obtained from okta portal
-      SSO_APP_EMBED_LINK: "" # embed link obtained from okta portal
+      AUTH_SOURCE: "" # Set it to SAML or OIDC for SSO or leave it blank
+      SSO_BASE_URL: "" # Base URL for SAML Single Sign-On
+      SSO_ENTITY_ID: "" # Entity ID URL obtained from SAML Single Sign-On portal
+      SSO_APP_EMBED_LINK: "" # embed link obtained from SAML Single Sign-On portal
+      SSO_PROVIDER_URL: "" # OpenID Connect Provider (OP) that will send the token
+      SSO_CLIENT_ID: "" # Client ID given by OIDC Provider
+      SSO_ISSUER_URL: "" # URL for custom Authorization Server
+      SSO_REDIRECT_URL: "" # Absolute URI where OIDC token will be sent
+      SSO_RESPONSE_TYPE: "code" # Response type - can be [code id_token token]
+      SSO_IMPLICIT_FLOW: "FALSE" # Implicit flow - true or false
     secrets:
       - source: SSH_PRIVATE_KEY
       - source: SSH_AUTHORIZED_KEYS
       - source: SSO_CERTIFICATE
+      - source: SSO_CLIENT_SECRET
       - source: SODIUM_CRYPTO_KEY
     ports:
       - "80:80"
@@ -98,10 +106,22 @@ services:
 #      SSO_BASE_URL: "" # Base URL for SSO
 #      SSO_ENTITY_ID: "" # Entity ID URL obtained from okta portal
 #      SSO_APP_EMBED_LINK: "" # embed link obtained from okta portal
+#      AUTH_SOURCE: "" # Set it to SAML or OIDC for SSO or leave it blank
+#      SSO_BASE_URL: "" # Base URL for SAML Single Sign-On
+#      SSO_ENTITY_ID: "" # Entity ID URL obtained from SAML Single Sign-On portal
+#      SSO_APP_EMBED_LINK: "" # embed link obtained from SAML Single Sign-On portal
+#      SSO_PROVIDER_URL: "" # OpenID Connect Provider (OP) that will send the token
+#      SSO_CLIENT_ID: "" # Client ID given by OIDC Provider
+#      SSO_CLIENT_SECRET: "" # Client Secret given by OIDC Provider
+#      SSO_ISSUER_URL: "" # URL for custom Authorization Server
+#      SSO_REDIRECT_URL: "" # Absolute URI where OIDC token will be sent
+#      SSO_RESPONSE_TYPE: "code" # Response type - can be [code id_token token]
+#      SSO_IMPLICIT_FLOW: "FALSE" # Implicit flow - true or false
 #    secrets:
 #      - source: SSH_PRIVATE_KEY
 #      - source: SSH_AUTHORIZED_KEYS
 #      - source: SSO_CERTIFICATE
+#      - source: SSO_CLIENT_SECRET
 #      - source: SODIUM_CRYPTO_KEY
 #    ports:
 #      - "7777:80"
@@ -130,5 +150,7 @@ secrets:
     file: ~/.ssh/id_rsa.pub
   SSO_CERTIFICATE:
     file: sso.cert
+  SSO_CLIENT_SECRET:
+    file: oe_client_secret
   SODIUM_CRYPTO_KEY:
     file: key

@@ -97,8 +97,8 @@ The example compose file creates 3x containers:
 This demonstrates how 2 instances can connect to the same database and use the same code files. It also allows dual PHP version testing, while we migrate to PHP7.
 
 
-# Adding certificate for Single-Sign-On
-It is required to import the Okta certificate to Identity Provider. 
+# Adding certificate for SAML authentication for Single-Sign-On
+It is required to import the public certificate from Identity Provider for SAML authentication. 
 The certificate to be used for Single-Sign-On can be obtained from the Okta portal by following the steps below:
 
 `
@@ -108,6 +108,16 @@ Go to Okta Admin Home Page -> Applications -> Your Apps(SAML) -> General -> SAML
 
 Rename the file from okta.cert to sso.cert and put it in the Docker/web Folder
 Run `docker-compose up`, then the certificate will exist in the docker secret.
+
+
+# Adding Client Secret for OIDC authentication for Single-Sign-On
+OpenID Connect (OIDC) Authentication requires client id and client secret in order to request access token with user credentials.
+Client ID is a public identifier and so is safe to be set using docker environment variables.
+But since client secret is a private key that is shared only between authorization server and the application, it is recommended to set it using docker secrets.
+
+To set OIDC client secret using docker secrets, copy the client secret from the OpenID Connect Provider in the `oe_client_secret` file under Docker/web and set the encoding to UTF-8.
+
+Alternatively, client secret can be saved using docker environment variables as well.
 
 
 # Adding key for encryption/decryption
