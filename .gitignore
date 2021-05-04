@@ -5,3 +5,4 @@ local/*
 web/.env
 */.env
 web/key
+.vscode
